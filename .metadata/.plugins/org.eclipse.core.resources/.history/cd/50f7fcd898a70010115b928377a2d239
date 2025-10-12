@@ -1,0 +1,28 @@
+package com.mcaulley.app.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import java.util.List;
+
+@Entity
+@Table(name = "tb_cursos")
+@Getter
+@Setter
+public class Curso {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_curso")
+    private Long id;
+
+    private String nombre;
+    private String descripcion;
+    private int duracion; // en horas o semanas
+
+    @OneToMany(mappedBy = "curso")
+    private List<Horario> horarios;
+
+    @OneToMany(mappedBy = "curso")
+    private List<Inscripcion> inscripciones;
+}

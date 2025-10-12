@@ -1,0 +1,35 @@
+package com.mcaulley.app.service.impl;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.mcaulley.app.entity.Curso;
+import com.mcaulley.app.repository.CursoRepository;
+import com.mcaulley.app.service.CursoService;
+
+@Service
+public class CursoServiceImp implements CursoService {
+
+    @Autowired
+    private CursoRepository cursoRepository;
+
+    @Override
+    public List<Curso> listarTodos() {
+        return cursoRepository.findAll();
+    }
+
+    @Override
+    public Curso buscarPorId(Integer id) {
+        return cursoRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Curso guardar(Curso curso) {
+        return cursoRepository.save(curso);
+    }
+
+    @Override
+    public void eliminar(Integer id) {
+        cursoRepository.deleteById(id);
+    }
+}

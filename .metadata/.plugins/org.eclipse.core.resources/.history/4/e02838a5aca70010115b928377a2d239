@@ -1,0 +1,53 @@
+package com.mcaulley.app.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import com.mcaulley.app.entity.Alumna;
+import com.mcaulley.app.service.AlumnaService;
+
+@Controller
+@RequestMapping("/alumnas")
+public class AlumnaController {
+
+    @Autowired
+    private AlumnaService alumnaService;
+
+    // ✅ Listar todas las alumnas
+    @GetMapping
+    public String listarAlumnas(Model model) {
+        model.addAttribute("listaAlumnas", alumnaService.listarTodas());
+        return "alumnas/lista";
+    }
+
+    // ✅ Mostrar formulario de registro
+    @GetMapping("/nuevo")
+    public String nuevaAlumna(Model model) {
+        model.addAttribute("alumna", new Alumna());
+        return "alumnas/form";
+    }
+
+    // ✅ Guardar una nueva alumna
+//    @PostMapping("/guardar")
+//    public String guardarAlumna(@ModelAttribute("alumna") Alumna alumna) {
+//        alumnaService.buscarPorNombre(null) // Cambia esto - usa el service para guardar
+//        return "redirect:/alumnas";
+//    }
+
+    // ✅ Buscar por ID
+    @GetMapping("/detalle/{id}")
+    public String detalleAlumna(@PathVariable Integer id, Model model) {
+        Alumna alumna = alumnaService.buscarPorId(id);
+        model.addAttribute("alumna", alumna);
+        return "alumnas/detalle";
+    }
+
+    // ✅ Buscar por nombre
+    @GetMapping("/buscar")
+    public String buscarPorNombre(@RequestParam("nombre") String nombre, Model model) {
+        Alumna alumna = alumnaService.buscarPorNombre(nombre);
+        model.addAttribute("alumnaEncontrada", alumna);
+        return "alumnas/buscar";
+    }
+}

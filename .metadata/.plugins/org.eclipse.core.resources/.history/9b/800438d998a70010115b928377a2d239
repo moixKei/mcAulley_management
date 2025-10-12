@@ -1,0 +1,15 @@
+package com.mcaulley.app.service;
+
+import java.util.List;
+import com.mcaulley.app.entity.Horario;
+
+public interface HorarioService {
+
+    List<Horario> listarTodos();
+
+    Horario buscarPorId(Long id);
+
+    Horario guardar(Horario horario);
+
+    void eliminar(Long id);
+}

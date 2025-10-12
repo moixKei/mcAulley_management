@@ -1,0 +1,5 @@
+package com.mcaulley.app.entity;
+
+public class Curso {
+
+}

@@ -1,0 +1,13 @@
+package com.mcaulley.app.service;
+
+import java.util.List;
+import com.mcaulley.app.entity.Alumna;
+
+public interface AlumnaService {
+
+    List<Alumna> listarTodas();
+
+    Alumna buscarPorId(Long id);
+
+    Alumna buscarPorNombre(String nombre);
+}

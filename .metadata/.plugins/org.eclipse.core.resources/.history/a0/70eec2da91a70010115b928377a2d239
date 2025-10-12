@@ -1,0 +1,5 @@
+package com.mcaulley.app.service.impl;
+
+public class HorarioServiceImp {
+
+}

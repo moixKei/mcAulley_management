@@ -1,0 +1,28 @@
+package com.mcaulley.app.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import java.sql.Date;
+
+@Entity
+@Table(name = "tb_alumnas")
+@Getter
+@Setter
+public class Alumna {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_alumna")
+    private Long id;
+
+    private String nombre;
+    private String apellido;
+    private String dni;
+    private String correo;
+    private String celular;
+    private String direccion;
+
+    @Column(columnDefinition = "DATE DEFAULT CURRENT_DATE")
+    private Date fecha_registro;
+}

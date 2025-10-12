@@ -1,0 +1,72 @@
+package com.mcaulley.app.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import com.mcaulley.app.entity.Alumna;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface AlumnaRepository extends JpaRepository<Alumna, Integer> {
+
+    // ✅ Búsquedas básicas
+    Optional<Alumna> findByDni(String dni);
+    Optional<Alumna> findByCorreo(String correo);
+    List<Alumna> findByNombre(String nombre);
+    List<Alumna> findByApellido(String apellido);
+    
+    // ✅ Búsqueda por nombre completo (usando LIKE)
+    @Query("SELECT a FROM Alumna a WHERE LOWER(a.nombre) LIKE LOWER(CONCAT('%', :nombre, '%')) OR LOWER(a.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))")
+    List<Alumna> buscarPorNombreOApellido(@Param("nombre") String nombre, @Param("apellido") String apellido);
+    
+    // ✅ Búsqueda por nombre y apellido exactos
+    List<Alumna> findByNombreAndApellido(String nombre, String apellido);
+    
+    // ✅ Búsqueda nativa mejorada (evita duplicados)
+    @Query(value = "SELECT * FROM tb_alumnas WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1", nativeQuery = true)
+    Optional<Alumna> buscarPorNombreExacto(@Param("nombre") String nombre);
+    
+    // ✅ Búsqueda por estado activo
+    List<Alumna> findByActivoTrue();
+    List<Alumna> findByActivoFalse();
+    
+    // ✅ Búsqueda por rango de fechas
+    List<Alumna> findByFechaRegistroAfter(LocalDate fecha);
+    List<Alumna> findByFechaRegistroBefore(LocalDate fecha);
+    List<Alumna> findByFechaRegistroBetween(LocalDate startDate, LocalDate endDate);
+    
+    // ✅ Búsqueda por teléfono (parcial)
+    @Query("SELECT a FROM Alumna a WHERE a.celular LIKE %:celular%")
+    List<Alumna> buscarPorCelularConteniendo(@Param("celular") String celular);
+    
+    // ✅ Búsqueda por dirección (parcial)
+    @Query("SELECT a FROM Alumna a WHERE LOWER(a.direccion) LIKE LOWER(CONCAT('%', :direccion, '%'))")
+    List<Alumna> buscarPorDireccionConteniendo(@Param("direccion") String direccion);
+    
+    // ✅ Consultas de reportes/estadísticas
+    @Query("SELECT COUNT(a) FROM Alumna a WHERE a.activo = true")
+    Long contarAlumnasActivas();
+    
+    @Query("SELECT a.fechaRegistro, COUNT(a) FROM Alumna a GROUP BY a.fechaRegistro ORDER BY a.fechaRegistro DESC")
+    List<Object[]> contarAlumnasPorFechaRegistro();
+    
+    @Query("SELECT MONTH(a.fechaRegistro), COUNT(a) FROM Alumna a WHERE YEAR(a.fechaRegistro) = :year GROUP BY MONTH(a.fechaRegistro)")
+    List<Object[]> contarAlumnasPorMes(@Param("year") int year);
+    
+    // ✅ Verificación de existencia
+    boolean existsByDni(String dni);
+    boolean existsByCorreo(String correo);
+    boolean existsByDniAndIdAlumnaNot(String dni, Integer idAlumna);
+    
+    // ✅ Búsqueda con paginación personalizada
+    @Query("SELECT a FROM Alumna a WHERE a.activo = true ORDER BY a.apellido, a.nombre")
+    List<Alumna> findAlumnasActivasOrdenadas();
+    
+    // ✅ Búsqueda para autocompletado
+    @Query("SELECT a.idAlumna, a.nombre, a.apellido FROM Alumna a WHERE LOWER(CONCAT(a.nombre, ' ', a.apellido)) LIKE LOWER(CONCAT('%', :texto, '%')) AND a.activo = true")
+    List<Object[]> buscarParaAutocompletado(@Param("texto") String texto);
+}

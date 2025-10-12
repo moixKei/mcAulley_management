@@ -1,0 +1,5 @@
+package com.mcaulley.app.service;
+
+public interface CursoService {
+
+}

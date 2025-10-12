@@ -1,0 +1,24 @@
+package com.mcaulley.app.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.mcaulley.app.entity.Alumna;
+import com.mcaulley.app.repository.AlumnaRepository;
+import com.mcaulley.app.service.AlumnaService;
+
+public class AlumnaServiceImpl implements AlumnaService{
+	
+	@Autowired
+	AlumnaRepository alumnaRepository;
+	
+	public List<Alumna> listarTodasAlumna(){
+		return alumnaRepository.findAll();
+	}
+	
+	@Override
+	public Alumna buscarById(Integer id) {
+		return alumnaRepository.findById(id).get();
+	}
+}
