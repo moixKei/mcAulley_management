@@ -9,7 +9,9 @@ import com.mcaulley.app.entity.Alumna;
 import com.mcaulley.app.service.AlumnaService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -216,9 +218,18 @@ public class AlumnaController {
     // ✅ Página de estadísticas
     @GetMapping("/estadisticas")
     public String mostrarEstadisticas(Model model) {
-        model.addAttribute("estadisticas", alumnaService.obtenerEstadisticas());
-        model.addAttribute("alumnasPorMes", alumnaService.obtenerAlumnasPorMes(LocalDate.now().getYear()));
-        return "alumnas/estadisticas";
+        try {
+            Map<String, Long> estadisticas = alumnaService.obtenerEstadisticas();
+            List<Object[]> alumnasPorMes = alumnaService.obtenerAlumnasPorMes(LocalDate.now().getYear());
+            
+            model.addAttribute("estadisticas", estadisticas);
+            model.addAttribute("alumnasPorMes", alumnasPorMes != null ? alumnasPorMes : new ArrayList<>());
+            
+            return "alumnas/estadisticas";
+        } catch (Exception e) {
+            // En caso de error, redirigir a la lista principal
+            return "redirect:/alumnas";
+        }
     }
 
     // ✅ Verificación de DNI (para validaciones en frontend)
