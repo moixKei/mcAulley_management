@@ -1,0 +1,263 @@
+package com.mcaulley.app.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.mcaulley.app.entity.Alumna;
+import com.mcaulley.app.service.AlumnaService;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Controller
+@RequestMapping("/alumnas")
+public class AlumnaController {
+
+    @Autowired
+    private AlumnaService alumnaService;
+
+    // ✅ Página principal - Listar todas las alumnas
+    @GetMapping
+    public String listarAlumnas(Model model) {
+        model.addAttribute("listaAlumnas", alumnaService.listarTodas());
+        model.addAttribute("totalAlumnas", alumnaService.contarTotalAlumnas());
+        model.addAttribute("alumnasActivas", alumnaService.contarAlumnasActivas());
+        return "alumnas/lista";
+    }
+
+    // ✅ Listar solo alumnas activas
+    @GetMapping("/activas")
+    public String listarAlumnasActivas(Model model) {
+        model.addAttribute("listaAlumnas", alumnaService.buscarAlumnasActivas());
+        model.addAttribute("filtro", "activas");
+        return "alumnas/lista";
+    }
+
+    // ✅ Búsqueda avanzada con filtros
+    @GetMapping("/buscar")
+    public String buscarAlumnas(
+            @RequestParam(value = "nombre", required = false) String nombre,
+            @RequestParam(value = "apellido", required = false) String apellido,
+            @RequestParam(value = "dni", required = false) String dni,
+            @RequestParam(value = "activa", required = false) Boolean activa,
+            Model model) {
+        
+        List<Alumna> resultados;
+        
+        if (dni != null && !dni.trim().isEmpty()) {
+            // Búsqueda por DNI exacto
+            Optional<Alumna> alumna = alumnaService.buscarPorDni(dni.trim());
+            resultados = alumna.map(List::of).orElse(List.of());
+        } else {
+            // Búsqueda por filtros múltiples
+            resultados = alumnaService.buscarConFiltros(nombre, apellido, activa, null, null);
+        }
+        
+        model.addAttribute("listaAlumnas", resultados);
+        model.addAttribute("filtroNombre", nombre);
+        model.addAttribute("filtroApellido", apellido);
+        model.addAttribute("filtroDni", dni);
+        model.addAttribute("filtroActiva", activa);
+        model.addAttribute("totalResultados", resultados.size());
+        
+        return "alumnas/lista";
+    }
+
+    // ✅ Autocompletado para búsquedas en tiempo real
+    @GetMapping("/autocompletar")
+    @ResponseBody
+    public List<Alumna> autocompletar(@RequestParam("q") String query) {
+        return alumnaService.buscarParaAutocompletado(query);
+    }
+
+    // ✅ Mostrar formulario de registro
+    @GetMapping("/nuevo")
+    public String nuevaAlumna(Model model) {
+        model.addAttribute("alumna", new Alumna());
+        model.addAttribute("modo", "nuevo");
+        return "alumnas/form";
+    }
+
+    // ✅ Guardar una nueva alumna
+    @PostMapping("/guardar")
+    public String guardarAlumna(@ModelAttribute("alumna") Alumna alumna, 
+                               RedirectAttributes redirectAttributes) {
+        try {
+            alumnaService.guardar(alumna);
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumna registrada exitosamente: " + alumna.getNombreCompleto());
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/alumnas/nuevo";
+        }
+        return "redirect:/alumnas";
+    }
+
+    // ✅ Mostrar formulario de edición
+    @GetMapping("/editar/{id}")
+    public String editarAlumna(@PathVariable Integer id, Model model, 
+                              RedirectAttributes redirectAttributes) {
+        Optional<Alumna> alumnaOpt = alumnaService.buscarPorId(id);
+        
+        if (alumnaOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Alumna no encontrada");
+            return "redirect:/alumnas";
+        }
+        
+        model.addAttribute("alumna", alumnaOpt.get());
+        model.addAttribute("modo", "editar");
+        return "alumnas/form";
+    }
+
+    // ✅ Actualizar alumna existente
+    @PostMapping("/actualizar/{id}")
+    public String actualizarAlumna(@PathVariable Integer id,
+                                  @ModelAttribute("alumna") Alumna alumna,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            alumnaService.actualizar(id, alumna);
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumna actualizada exitosamente: " + alumna.getNombreCompleto());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/alumnas/editar/" + id;
+        }
+        return "redirect:/alumnas";
+    }
+
+    // ✅ Ver detalle de alumna
+    @GetMapping("/detalle/{id}")
+    public String detalleAlumna(@PathVariable Integer id, Model model,
+                               RedirectAttributes redirectAttributes) {
+        Optional<Alumna> alumnaOpt = alumnaService.buscarPorId(id);
+        
+        if (alumnaOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Alumna no encontrada");
+            return "redirect:/alumnas";
+        }
+        
+        model.addAttribute("alumna", alumnaOpt.get());
+        return "alumnas/detalle";
+    }
+
+    // ✅ Eliminar alumna
+    @PostMapping("/eliminar/{id}")
+    public String eliminarAlumna(@PathVariable Integer id,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            Alumna alumna = alumnaService.buscarPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Alumna no encontrada"));
+            
+            alumnaService.eliminar(id);
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumna eliminada: " + alumna.getNombreCompleto());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/alumnas";
+    }
+
+    // ✅ Activar/Desactivar alumna (toggle)
+    @PostMapping("/toggle-estado/{id}")
+    public String toggleEstadoAlumna(@PathVariable Integer id,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            boolean nuevoEstado = alumnaService.toggleEstadoAlumna(id);
+            String estado = nuevoEstado ? "activada" : "desactivada";
+            
+            Alumna alumna = alumnaService.buscarPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Alumna no encontrada"));
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumna " + estado + ": " + alumna.getNombreCompleto());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/alumnas";
+    }
+
+    // ✅ Activar alumna específica
+    @PostMapping("/activar/{id}")
+    public String activarAlumna(@PathVariable Integer id,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            alumnaService.activarAlumna(id);
+            Alumna alumna = alumnaService.buscarPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Alumna no encontrada"));
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumna activada: " + alumna.getNombreCompleto());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/alumnas";
+    }
+
+    // ✅ Desactivar alumna específica
+    @PostMapping("/desactivar/{id}")
+    public String desactivarAlumna(@PathVariable Integer id,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            alumnaService.desactivarAlumna(id);
+            Alumna alumna = alumnaService.buscarPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Alumna no encontrada"));
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumna desactivada: " + alumna.getNombreCompleto());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/alumnas";
+    }
+
+    // ✅ Página de estadísticas
+    @GetMapping("/estadisticas")
+    public String mostrarEstadisticas(Model model) {
+        try {
+            Map<String, Long> estadisticas = alumnaService.obtenerEstadisticas();
+            List<Object[]> alumnasPorMes = alumnaService.obtenerAlumnasPorMes(LocalDate.now().getYear());
+            
+            model.addAttribute("estadisticas", estadisticas);
+            model.addAttribute("alumnasPorMes", alumnasPorMes != null ? alumnasPorMes : new ArrayList<>());
+            
+            return "alumnas/estadisticas";
+        } catch (Exception e) {
+            // En caso de error, redirigir a la lista principal
+            return "redirect:/alumnas";
+        }
+    }
+
+    // ✅ Verificación de DNI (para validaciones en frontend)
+    @GetMapping("/verificar-dni")
+    @ResponseBody
+    public String verificarDni(@RequestParam String dni, 
+                              @RequestParam(required = false) Integer idExcluir) {
+        if (idExcluir != null) {
+            boolean existe = alumnaService.existeOtraAlumnaConDni(dni, idExcluir);
+            return existe ? "EXISTE" : "DISPONIBLE";
+        } else {
+            boolean existe = alumnaService.existeAlumnaConDni(dni);
+            return existe ? "EXISTE" : "DISPONIBLE";
+        }
+    }
+
+    // ✅ Operación batch - Desactivar alumnas antiguas
+    @PostMapping("/desactivar-antiguas")
+    public String desactivarAlumnasAntiguas(RedirectAttributes redirectAttributes) {
+        try {
+            LocalDate fechaLimite = LocalDate.now().minusMonths(6); // 6 meses atrás
+            alumnaService.desactivarAlumnasAntiguas(fechaLimite);
+            redirectAttributes.addFlashAttribute("success", 
+                "Alumnas antiguas desactivadas automáticamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error al desactivar alumnas antiguas: " + e.getMessage());
+        }
+        return "redirect:/alumnas";
+    }
+}

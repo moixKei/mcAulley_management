@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cursos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-book me-2"></i>Gestión de Cursos</h1>
+            <a th:href="@{/cursos/nuevo}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Nuevo Curso
+            </a>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Buscador -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/cursos/buscar}" method="get" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="nombre" class="form-control" 
+                               placeholder="Buscar cursos por nombre..." 
+                               th:value="${terminoBusqueda ?: ''}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-1"></i>Buscar
+                        </button>
+                        <a th:href="@{/cursos}" class="btn btn-secondary">
+                            <i class="fas fa-refresh me-1"></i>Limpiar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de Cursos -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-1"></i>
+                    Lista de Cursos 
+                    <span th:if="${terminoBusqueda}" class="badge bg-light text-dark">
+                        Búsqueda: "<span th:text="${terminoBusqueda}"></span>"
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${cursos.empty}" class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No se encontraron cursos</h5>
+                    <p th:if="${terminoBusqueda}" class="text-muted">
+                        No hay resultados para "<span th:text="${terminoBusqueda}"></span>"
+                    </p>
+                    <a th:href="@{/cursos/nuevo}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus me-1"></i>Crear Primer Curso
+                    </a>
+                </div>
+
+                <div th:unless="${cursos.empty}" class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Duración (horas)</th>
+                                <th>Precio</th>
+                                <th>Cupo Máximo</th>
+                                <th>Estado</th>
+                                <th>Activo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="curso : ${cursos}">
+                                <td th:text="${curso.idCurso}"></td>
+                                <td>
+                                    <strong th:text="${curso.nombre}"></strong>
+                                    <br>
+                                    <small class="text-muted" th:text="${curso.descripcion} ?: 'Sin descripción'"></small>
+                                </td>
+                                <td th:text="${curso.duracionHoras} ?: 'N/A'"></td>
+                                <td>
+                                    <span th:if="${curso.precio > 0}" 
+                                          th:text="'$' + ${#numbers.formatDecimal(curso.precio, 1, 2)}"
+                                          class="badge bg-success">
+                                    </span>
+                                    <span th:unless="${curso.precio > 0}" 
+                                          class="badge bg-secondary">Gratis</span>
+                                </td>
+                                <td th:text="${curso.cupoMaximo}"></td>
+                                <td>
+                                    <span th:text="${curso.estado.nombre}"
+                                          th:classappend="${curso.estado.nombre == 'Activo'} ? 'badge bg-success' : 
+                                                          ${curso.estado.nombre == 'Inactivo'} ? 'badge bg-danger' : 
+                                                          'badge bg-warning'">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${curso.activo}" class="badge bg-success">
+                                        <i class="fas fa-check"></i> Sí
+                                    </span>
+                                    <span th:unless="${curso.activo}" class="badge bg-danger">
+                                        <i class="fas fa-times"></i> No
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a th:href="@{/cursos/detalle/{id}(id=${curso.idCurso})}" 
+                                           class="btn btn-info" title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/cursos/editar/{id}(id=${curso.idCurso})}" 
+                                           class="btn btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form th:action="@{/cursos/eliminar/{id}(id=${curso.idCurso})}" 
+                                              method="post" class="d-inline"
+                                              th:onsubmit="return confirm('¿Está seguro de eliminar el curso \\'' + ${curso.nombre} + '\\'?');">
+                                            <button type="submit" class="btn btn-danger" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(cursos)}">0</h4>
+                                <p class="mb-0">Total Cursos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-book fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${cursoService.contarCursosActivos()}">0</h4>
+                                <p class="mb-0">Cursos Activos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-check-circle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

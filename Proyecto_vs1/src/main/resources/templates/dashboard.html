@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Gestión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        .quick-action {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .quick-action:hover {
+            background: #f8f9fa;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Sistema Educativo
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" th:href="@{/}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link" th:href="@{/menu}"><i class="fas fa-bars me-1"></i>Menú</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="welcome-section p-5 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold">Bienvenido al Sistema</h1>
+                    <p class="lead mb-0">Panel de control para la gestión integral de estudiantes y cursos</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <i class="fas fa-chart-line fa-4x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h3 class="mb-3"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h3>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a th:href="@{/alumnas}" class="text-decoration-none">
+                            <div class="quick-action">
+                                <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                                <h5>Gestión de Alumnas</h5>
+                                <p class="text-muted mb-0">Administrar estudiantes</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/cursos}" class="text-decoration-none">
+                            <div class="quick-action">
+                                <i class="fas fa-book fa-2x text-success mb-3"></i>
+                                <h5>Gestión de Cursos</h5>
+                                <p class="text-muted mb-0">Administrar cursos</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/cursos/nuevo}" class="text-decoration-none">
+                            <div class="quick-action">
+                                <i class="fas fa-plus-circle fa-2x text-warning mb-3"></i>
+                                <h5>Nuevo Curso</h5>
+                                <p class="text-muted mb-0">Crear nuevo curso</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/menu}" class="text-decoration-none">
+                            <div class="quick-action">
+                                <i class="fas fa-compass fa-2x text-info mb-3"></i>
+                                <h5>Menú Completo</h5>
+                                <p class="text-muted mb-0">Ver todas las opciones</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x mb-3 opacity-75"></i>
+                        <div class="stat-number" th:text="${totalAlumnas ?: '0'}">0</div>
+                        <h5>Total Alumnas</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x mb-3 opacity-75"></i>
+                        <div class="stat-number" th:text="${totalCursos ?: '0'}">0</div>
+                        <h5>Total Cursos</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card bg-warning text-dark">
+                    <div class="card-body text-center">
+                        <i class="fas fa-play-circle fa-3x mb-3 opacity-75"></i>
+                        <div class="stat-number" th:text="${cursosActivos ?: '0'}">0</div>
+                        <h5>Cursos Activos</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card dashboard-card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-bar fa-3x mb-3 opacity-75"></i>
+                        <div class="stat-number" th:text="${totalInscripciones ?: '0'}">0</div>
+                        <h5>Inscripciones</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Actividad Reciente</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item">
+                                <i class="fas fa-user-plus text-success me-2"></i>
+                                <span>Nueva alumna registrada</span>
+                                <small class="text-muted d-block">Hace 2 horas</small>
+                            </div>
+                            <div class="list-group-item">
+                                <i class="fas fa-book text-warning me-2"></i>
+                                <span>Curso actualizado: Programación Web</span>
+                                <small class="text-muted d-block">Hace 5 horas</small>
+                            </div>
+                            <div class="list-group-item">
+                                <i class="fas fa-check-circle text-info me-2"></i>
+                                <span>Inscripción completada</span>
+                                <small class="text-muted d-block">Ayer</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Próximas Actividades</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item">
+                                <i class="fas fa-calendar text-primary me-2"></i>
+                                <span>Revisión de inscripciones pendientes</span>
+                                <small class="text-muted d-block">Próximos 2 días</small>
+                            </div>
+                            <div class="list-group-item">
+                                <i class="fas fa-bell text-warning me-2"></i>
+                                <span>Recordatorio: Cursos que inician pronto</span>
+                                <small class="text-muted d-block">Esta semana</small>
+                            </div>
+                            <div class="list-group-item">
+                                <i class="fas fa-chart-line text-info me-2"></i>
+                                <span>Reporte mensual de actividades</span>
+                                <small class="text-muted d-block">Fin de mes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Sistema Educativo. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

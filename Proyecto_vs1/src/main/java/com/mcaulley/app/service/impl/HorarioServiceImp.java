@@ -1,35 +1,136 @@
 package com.mcaulley.app.service.impl;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.mcaulley.app.entity.Horario;
 import com.mcaulley.app.repository.HorarioRepository;
 import com.mcaulley.app.service.HorarioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class HorarioServiceImp implements HorarioService {
 
     @Autowired
     private HorarioRepository horarioRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Horario> listarTodos() {
         return horarioRepository.findAll();
     }
 
     @Override
-    public Horario buscarPorId(Integer id) {
-        return horarioRepository.findById(id).orElse(null);
+    @Transactional(readOnly = true)
+    public Optional<Horario> buscarPorId(Integer id) {
+        if (id == null || id <= 0) {
+            return Optional.empty();
+        }
+        return horarioRepository.findById(id);
     }
 
     @Override
     public Horario guardar(Horario horario) {
+        if (!validarHorario(horario)) {
+            throw new IllegalArgumentException("Los datos del horario no son válidos");
+        }
         return horarioRepository.save(horario);
     }
 
     @Override
+    public Horario actualizar(Integer id, Horario horarioActualizado) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("ID de horario inválido");
+        }
+        
+        if (!validarHorario(horarioActualizado)) {
+            throw new IllegalArgumentException("Los datos del horario no son válidos");
+        }
+        
+        return horarioRepository.findById(id)
+                .map(horarioExistente -> {
+                    horarioExistente.setCurso(horarioActualizado.getCurso());
+                    horarioExistente.setDiaSemana(horarioActualizado.getDiaSemana());
+                    horarioExistente.setHoraInicio(horarioActualizado.getHoraInicio());
+                    horarioExistente.setHoraFin(horarioActualizado.getHoraFin());
+                    horarioExistente.setCuposDisponibles(horarioActualizado.getCuposDisponibles());
+                    return horarioRepository.save(horarioExistente);
+                })
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado con ID: " + id));
+    }
+
+    @Override
     public void eliminar(Integer id) {
-        horarioRepository.deleteById(id);
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("ID de horario inválido");
+        }
+        
+        Horario horario = horarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado con ID: " + id));
+        
+        horarioRepository.delete(horario);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Horario> buscarPorCurso(Integer idCurso) {
+        if (idCurso == null || idCurso <= 0) {
+            return List.of();
+        }
+        return horarioRepository.findByCurso_IdCurso(idCurso);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Horario> buscarPorDiaSemana(String diaSemana) {
+        if (diaSemana == null || diaSemana.trim().isEmpty()) {
+            return List.of();
+        }
+        return horarioRepository.findByDiaSemana(diaSemana.trim());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Horario> buscarHorariosConCupos() {
+        return horarioRepository.findHorariosConCuposDisponibles();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Horario> buscarHorariosActivos() {
+        return horarioRepository.findByActivoTrue();
+    }
+
+    @Override
+    public void reducirCupo(Integer idHorario) {
+        Horario horario = horarioRepository.findById(idHorario)
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+        
+        if (horario.getCuposDisponibles() > 0) {
+            horario.setCuposDisponibles(horario.getCuposDisponibles() - 1);
+            horarioRepository.save(horario);
+        }
+    }
+
+    @Override
+    public void aumentarCupo(Integer idHorario) {
+        Horario horario = horarioRepository.findById(idHorario)
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+        
+        horario.setCuposDisponibles(horario.getCuposDisponibles() + 1);
+        horarioRepository.save(horario);
+    }
+
+    @Override
+    public boolean validarHorario(Horario horario) {
+        return horario != null && 
+               horario.getCurso() != null &&
+               horario.getDiaSemana() != null &&
+               horario.getHoraInicio() != null &&
+               horario.getHoraFin() != null &&
+               horario.getCuposDisponibles() != null && horario.getCuposDisponibles() >= 0;
     }
 }

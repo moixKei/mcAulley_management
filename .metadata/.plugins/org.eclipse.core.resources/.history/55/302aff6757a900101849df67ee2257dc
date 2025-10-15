@@ -1,0 +1,126 @@
+package com.mcaulley.app.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.mcaulley.app.entity.Curso;
+import com.mcaulley.app.entity.EstadoCurso;
+import com.mcaulley.app.service.CursoService;
+import com.mcaulley.app.service.EstadoCursoService;
+
+import java.util.List;
+import java.util.Optional;
+
+@Controller
+@RequestMapping("/cursos")
+public class CursoController {
+
+    @Autowired
+    private CursoService cursoService;
+
+    @Autowired
+    private EstadoCursoService estadoCursoService;
+
+    // ✅ Listar todos los cursos
+    @GetMapping
+    public String listarCursos(Model model) {
+        model.addAttribute("cursos", cursoService.listarTodos());
+        return "cursos/lista";
+    }
+
+    // ✅ Mostrar formulario para nuevo curso
+    @GetMapping("/nuevo")
+    public String mostrarFormularioNuevo(Model model) {
+        model.addAttribute("curso", new Curso());
+        model.addAttribute("estados", estadoCursoService.listarTodos());
+        model.addAttribute("modo", "nuevo");
+        return "cursos/form";
+    }
+
+    // ✅ Guardar nuevo curso
+    @PostMapping("/guardar")
+    public String guardarCurso(@ModelAttribute Curso curso, 
+                              RedirectAttributes redirectAttributes) {
+        try {
+            cursoService.guardar(curso);
+            redirectAttributes.addFlashAttribute("success", 
+                "Curso creado exitosamente: " + curso.getNombre());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error al crear curso: " + e.getMessage());
+        }
+        return "redirect:/cursos";
+    }
+
+    // ✅ Mostrar formulario para editar curso
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioEditar(@PathVariable Integer id, Model model,
+                                         RedirectAttributes redirectAttributes) {
+        Optional<Curso> curso = cursoService.buscarPorId(id);
+        if (curso.isPresent()) {
+            model.addAttribute("curso", curso.get());
+            model.addAttribute("estados", estadoCursoService.listarTodos());
+            model.addAttribute("modo", "editar");
+            return "cursos/form";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Curso no encontrado");
+            return "redirect:/cursos";
+        }
+    }
+
+    // ✅ Actualizar curso existente
+    @PostMapping("/actualizar/{id}")
+    public String actualizarCurso(@PathVariable Integer id,
+                                 @ModelAttribute Curso curso,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            curso.setIdCurso(id);
+            cursoService.guardar(curso);
+            redirectAttributes.addFlashAttribute("success", 
+                "Curso actualizado exitosamente: " + curso.getNombre());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error al actualizar curso: " + e.getMessage());
+        }
+        return "redirect:/cursos";
+    }
+
+    // ✅ Ver detalle del curso
+    @GetMapping("/detalle/{id}")
+    public String verDetalle(@PathVariable Integer id, Model model,
+                            RedirectAttributes redirectAttributes) {
+        Optional<Curso> curso = cursoService.buscarPorId(id);
+        if (curso.isPresent()) {
+            model.addAttribute("curso", curso.get());
+            return "cursos/detalle";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Curso no encontrado");
+            return "redirect:/cursos";
+        }
+    }
+
+    // ✅ Eliminar curso
+    @PostMapping("/eliminar/{id}")
+    public String eliminarCurso(@PathVariable Integer id,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            cursoService.eliminar(id);
+            redirectAttributes.addFlashAttribute("success", "Curso eliminado exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error al eliminar curso: " + e.getMessage());
+        }
+        return "redirect:/cursos";
+    }
+
+    // ✅ Buscar cursos por nombre
+    @GetMapping("/buscar")
+    public String buscarCursos(@RequestParam String nombre, Model model) {
+        List<Curso> cursos = cursoService.buscarPorNombre(nombre);
+        model.addAttribute("cursos", cursos);
+        model.addAttribute("terminoBusqueda", nombre);
+        return "cursos/lista";
+    }
+}

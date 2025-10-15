@@ -227,7 +227,6 @@ public class AlumnaController {
             
             return "alumnas/estadisticas";
         } catch (Exception e) {
-            // En caso de error, redirigir a la lista principal
             return "redirect:/alumnas";
         }
     }

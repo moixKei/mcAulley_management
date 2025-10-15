@@ -1,0 +1,7 @@
+package com.mcaulley.app.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.mcaulley.app.entity.Inscripcion;
+
+public interface InscripcionRepository extends JpaRepository<Inscripcion, Integer> {
+}
