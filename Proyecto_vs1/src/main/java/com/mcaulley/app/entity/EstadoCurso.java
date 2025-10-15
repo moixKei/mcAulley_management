@@ -16,4 +16,7 @@ public class EstadoCurso {
     
     @Column(name = "nombre_estado", length = 10)
     private String nombreEstado;
+    
+    @Column(name = "activo")
+    private Boolean activo = true;
 }

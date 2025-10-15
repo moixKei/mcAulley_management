@@ -86,59 +86,60 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="curso : ${cursos}">
-                                <td th:text="${curso.idCurso}"></td>
-                                <td>
-                                    <strong th:text="${curso.nombre}"></strong>
-                                    <br>
-                                    <small class="text-muted" th:text="${curso.descripcion} ?: 'Sin descripción'"></small>
-                                </td>
-                                <td th:text="${curso.duracionHoras} ?: 'N/A'"></td>
-                                <td>
-                                    <span th:if="${curso.precio > 0}" 
-                                          th:text="'$' + ${#numbers.formatDecimal(curso.precio, 1, 2)}"
-                                          class="badge bg-success">
-                                    </span>
-                                    <span th:unless="${curso.precio > 0}" 
-                                          class="badge bg-secondary">Gratis</span>
-                                </td>
-                                <td th:text="${curso.cupoMaximo}"></td>
-                                <td>
-                                    <span th:text="${curso.estado.nombre}"
-                                          th:classappend="${curso.estado.nombre == 'Activo'} ? 'badge bg-success' : 
-                                                          ${curso.estado.nombre == 'Inactivo'} ? 'badge bg-danger' : 
-                                                          'badge bg-warning'">
-                                    </span>
-                                </td>
-                                <td>
-                                    <span th:if="${curso.activo}" class="badge bg-success">
-                                        <i class="fas fa-check"></i> Sí
-                                    </span>
-                                    <span th:unless="${curso.activo}" class="badge bg-danger">
-                                        <i class="fas fa-times"></i> No
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a th:href="@{/cursos/detalle/{id}(id=${curso.idCurso})}" 
-                                           class="btn btn-info" title="Ver detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a th:href="@{/cursos/editar/{id}(id=${curso.idCurso})}" 
-                                           class="btn btn-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form th:action="@{/cursos/eliminar/{id}(id=${curso.idCurso})}" 
-                                              method="post" class="d-inline"
-                                              th:onsubmit="return confirm('¿Está seguro de eliminar el curso \\'' + ${curso.nombre} + '\\'?');">
-                                            <button type="submit" class="btn btn-danger" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
+						    <tr th:each="curso : ${cursos}">
+						        <td th:text="${curso.idCurso}"></td>
+						        <td>
+						            <strong th:text="${curso.nombre}"></strong>
+						            <br>
+						            <small class="text-muted" th:text="${curso.descripcion} ?: 'Sin descripción'"></small>
+						        </td>
+						        <td th:text="${curso.duracionHoras} ?: 'N/A'"></td>
+						        <td>
+						            <span th:if="${curso.precio > 0}" 
+						                  th:text="'$' + ${#numbers.formatDecimal(curso.precio, 1, 2)}"
+						                  class="badge bg-success">
+						            </span>
+						            <span th:unless="${curso.precio > 0}" 
+						                  class="badge bg-secondary">Gratis</span>
+						        </td>
+						        <td th:text="${curso.cupoMaximo}"></td>
+						        <td>
+						            <!-- ✅ ESTADO DEL CURSO (Activo/Inactivo/En progreso) -->
+						            <span th:text="${curso.estado?.nombreEstado}"
+						                  th:classappend="${curso.estado?.nombreEstado == 'Activo'} ? 'badge bg-success' : 
+						                                  (${curso.estado?.nombreEstado == 'Inactivo'} ? 'badge bg-danger' : 'badge bg-warning')">
+						            </span>
+						        </td>
+						        <td>
+						            <!-- ✅ ESTADO ACTIVO/INACTIVO (booleano) -->
+						            <span th:if="${curso.activo}" class="badge bg-success">
+						                <i class="fas fa-check"></i> Sí
+						            </span>
+						            <span th:unless="${curso.activo}" class="badge bg-danger">
+						                <i class="fas fa-times"></i> No
+						            </span>
+						        </td>
+						        <td>
+						            <div class="btn-group btn-group-sm" role="group">
+						                <a th:href="@{/cursos/detalle/{id}(id=${curso.idCurso})}" 
+						                   class="btn btn-info" title="Ver detalle">
+						                    <i class="fas fa-eye"></i>
+						                </a>
+						                <a th:href="@{/cursos/editar/{id}(id=${curso.idCurso})}" 
+						                   class="btn btn-warning" title="Editar">
+						                    <i class="fas fa-edit"></i>
+						                </a>
+						                <form th:action="@{/cursos/eliminar/{id}(id=${curso.idCurso})}" 
+						                      method="post" class="d-inline"
+						                      th:onsubmit="return confirm('¿Está seguro de eliminar el curso \\'' + ${curso.nombre} + '\\'?');">
+						                    <button type="submit" class="btn btn-danger" title="Eliminar">
+						                        <i class="fas fa-trash"></i>
+						                    </button>
+						                </form>
+						            </div>
+						        </td>
+						    </tr>
+						</tbody>
                     </table>
                 </div>
             </div>

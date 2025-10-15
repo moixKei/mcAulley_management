@@ -58,5 +58,8 @@ public class Curso {
         if (this.activo == null) {
             this.activo = true;
         }
+        if (this.duracionHoras == null) {
+            this.duracionHoras = 0; 
+        }
     }
 }

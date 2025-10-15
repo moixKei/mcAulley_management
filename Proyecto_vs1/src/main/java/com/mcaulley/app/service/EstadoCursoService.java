@@ -5,7 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EstadoCursoService {
-    List<EstadoCurso> listarTodos();
+	List<EstadoCurso> listarTodos();
+    
     Optional<EstadoCurso> buscarPorId(Integer id);
-    Optional<EstadoCurso> buscarPorNombre(String nombre);
+    
+    // ✅ Actualizar este método
+    Optional<EstadoCurso> buscarPorNombreEstado(String nombreEstado);
+    
+    EstadoCurso guardar(EstadoCurso estadoCurso);
+    
+    void eliminar(Integer id);
 }

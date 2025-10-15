@@ -53,17 +53,16 @@
                             <div class="col-md-6">
                                 <p><strong>Cupo Máximo:</strong> <span th:text="*{cupoMaximo}"></span> estudiantes</p>
                                 <!-- En detalle.html, actualiza esta parte -->
-<p><strong>Estado:</strong> 
-    <span th:if="${curso.estado != null}" 
-          th:text="${curso.estado.nombre}"
-          th:classappend="${curso.estado.nombre == 'Activo'} ? 'badge bg-success' : 
-                          ${curso.estado.nombre == 'Inactivo'} ? 'badge bg-danger' : 
-                          'badge bg-warning'">
-    </span>
-    <span th:if="${curso.estado == null}" class="badge bg-secondary">
-        No asignado
-    </span>
-</p>
+								<p><strong>Estado:</strong> 
+								    <span th:if="${curso.estado != null}" 
+								          th:text="${curso.estado.nombreEstado}"
+								          th:classappend="${curso.estado.nombreEstado == 'Activo'} ? 'badge bg-success' :
+								                          (${curso.estado.nombreEstado == 'Inactivo'} ? 'badge bg-danger' : 'badge bg-warning')">
+								    </span>
+								    <span th:if="${curso.estado == null}" class="badge bg-secondary">
+								        No asignado
+								    </span>
+								</p>
                                 <p><strong>Activo:</strong> 
                                     <span th:if="*{activo}" class="badge bg-success">
                                         <i class="fas fa-check"></i> Sí

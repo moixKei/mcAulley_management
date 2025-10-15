@@ -1,9 +1,0 @@
-package com.mcaulley.app.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.mcaulley.app.entity.Alumna;
-
-public interface AlumnaRepository extends JpaRepository<Alumna, Integer>{
-
-}
