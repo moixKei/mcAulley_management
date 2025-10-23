@@ -1,9 +1,0 @@
-package com.mcaulley.app.service;
-
-import com.mcaulley.app.entity.EstadoCurso;
-import java.util.List;
-
-public interface EstadoCursoService {
-    List<EstadoCurso> listarTodos();
-    EstadoCurso buscarPorId(Integer id);
-}

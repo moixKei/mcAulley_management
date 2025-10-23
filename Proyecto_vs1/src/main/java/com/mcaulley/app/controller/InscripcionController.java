@@ -37,6 +37,7 @@ public class InscripcionController {
     @GetMapping
     public String listarInscripciones(Model model) {
         model.addAttribute("inscripciones", inscripcionService.listarTodas());
+        model.addAttribute("estadosPago", estadoPagoService.listarTodos()); 
         return "inscripciones/lista";
     }
 
@@ -80,21 +81,23 @@ public class InscripcionController {
         return "redirect:/inscripciones";
     }
 
-    // ✅ Ver inscripciones por alumna
+ // En inscripcionesPorAlumna
     @GetMapping("/alumna/{alumnaId}")
     public String inscripcionesPorAlumna(@PathVariable Integer alumnaId, Model model) {
         List<Inscripcion> inscripciones = inscripcionService.buscarPorAlumna(alumnaId);
         model.addAttribute("inscripciones", inscripciones);
+        model.addAttribute("estadosPago", estadoPagoService.listarTodos()); // ✅ AGREGAR
         Optional<Alumna> alumna = alumnaService.buscarPorId(alumnaId);
         alumna.ifPresent(a -> model.addAttribute("alumna", a));
         return "inscripciones/lista";
     }
 
-    // ✅ Ver inscripciones por horario
+    // En inscripcionesPorHorario
     @GetMapping("/horario/{horarioId}")
     public String inscripcionesPorHorario(@PathVariable Integer horarioId, Model model) {
         List<Inscripcion> inscripciones = inscripcionService.buscarPorHorario(horarioId);
         model.addAttribute("inscripciones", inscripciones);
+        model.addAttribute("estadosPago", estadoPagoService.listarTodos()); // ✅ AGREGAR
         Optional<Horario> horario = horarioService.buscarPorId(horarioId);
         horario.ifPresent(h -> model.addAttribute("horario", h));
         return "inscripciones/lista";
@@ -130,4 +133,6 @@ public class InscripcionController {
         }
         return "redirect:/inscripciones";
     }
+    
+    
 }

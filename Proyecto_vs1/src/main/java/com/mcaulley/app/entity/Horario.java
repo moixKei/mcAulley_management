@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import java.time.LocalTime;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "tb_horarios")
@@ -13,41 +12,42 @@ import java.time.LocalDate;
 @Setter
 @ToString
 public class Horario {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_horario")
     private Integer idHorario;
-
-    @Column(name = "dia_semana", nullable = false, length = 20)
-    private String diaSemana;
-
-    @Column(name = "hora_inicio", nullable = false)
-    private LocalTime horaInicio;
-
-    @Column(name = "hora_fin", nullable = false)
-    private LocalTime horaFin;
-
-    @Column(name = "fecha_inicio")
-    private LocalDate fechaInicio;
-
-    @Column(name = "fecha_fin")
-    private LocalDate fechaFin;
-
-    @Column(name = "cupos_disponibles")
-    private Integer cuposDisponibles = 0;
-
-    // ✅ AGREGAR ESTE CAMPO
-    @Column(name = "activo")
-    private Boolean activo = true;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_curso", nullable = false)
+    @JoinColumn(name = "id_curso")
     @ToString.Exclude
     private Curso curso;
-
-    public Horario() {
-        this.cuposDisponibles = 0;
-        this.activo = true;
+    
+    @Column(name = "dia_semana", length = 10)
+    private String diaSemana;
+    
+    @Column(name = "hora_inicio")
+    private LocalTime horaInicio;
+    
+    @Column(name = "hora_fin")
+    private LocalTime horaFin;
+    
+    @Column(name = "cupos_disponibles")
+    private Integer cuposDisponibles;
+    
+    @Column(name = "aula", length = 20)
+    private String aula;
+    
+    @Column(name = "activo")
+    private Boolean activo = true;
+    
+    @PrePersist
+    protected void onCreate() {
+        if (this.activo == null) {
+            this.activo = true;
+        }
+        if (this.cuposDisponibles == null && this.curso != null) {
+            this.cuposDisponibles = this.curso.getCupoMaximo();
+        }
     }
 }

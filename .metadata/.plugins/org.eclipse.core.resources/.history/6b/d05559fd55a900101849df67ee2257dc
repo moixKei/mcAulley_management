@@ -1,9 +1,0 @@
-package com.mcaulley.app.service;
-
-import com.mcaulley.app.entity.EstadoPago;
-import java.util.List;
-
-public interface EstadoPagoService {
-    List<EstadoPago> listarTodos();
-    EstadoPago buscarPorId(Integer id);
-}

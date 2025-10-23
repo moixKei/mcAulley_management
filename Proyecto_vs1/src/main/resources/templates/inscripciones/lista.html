@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inscripciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-user-graduate me-2"></i>Gestión de Inscripciones</h1>
+            <a th:href="@{/inscripciones/nuevo}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Nueva Inscripción
+            </a>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Información de Filtro -->
+        <div th:if="${alumna != null}" class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-1"></i>
+                    Inscripciones de: <span th:text="${alumna.nombre + ' ' + alumna.apellido}"></span>
+                </h5>
+            </div>
+        </div>
+
+        <div th:if="${horario != null}" class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-1"></i>
+                    Inscripciones para el horario: 
+                    <span th:text="${horario.curso.nombre + ' - ' + horario.diaSemana + ' ' + #temporals.format(horario.horaInicio, 'HH:mm') + ' a ' + #temporals.format(horario.horaFin, 'HH:mm')}"></span>
+                </h5>
+            </div>
+        </div>
+
+        <!-- Tabla de Inscripciones -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-1"></i>
+                    Lista de Inscripciones
+                    <span th:if="${alumna != null}" class="badge bg-light text-dark ms-2">
+                        Alumna: <span th:text="${alumna.nombre}"></span>
+                    </span>
+                    <span th:if="${horario != null}" class="badge bg-light text-dark ms-2">
+                        Horario: <span th:text="${horario.curso.nombre}"></span>
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${inscripciones.empty}" class="text-center py-4">
+                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No se encontraron inscripciones</h5>
+                    <p th:if="${alumna != null}" class="text-muted">
+                        No hay inscripciones registradas para esta alumna
+                    </p>
+                    <p th:if="${horario != null}" class="text-muted">
+                        No hay inscripciones registradas para este horario
+                    </p>
+                    <a th:href="@{/inscripciones/nuevo}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus me-1"></i>Crear Primera Inscripción
+                    </a>
+                </div>
+
+                <div th:unless="${inscripciones.empty}" class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Alumna</th>
+                                <th>Curso - Horario</th>
+                                <th>Fecha Inscripción</th>
+                                <th>Estado Pago</th>
+                                <th>Activo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="inscripcion : ${inscripciones}">
+                                <td th:text="${inscripcion.idInscripcion}"></td>
+                                <td>
+                                    <code th:text="${inscripcion.codigoInscripcion}"></code>
+                                </td>
+                                <td>
+                                    <strong th:text="${inscripcion.alumna.nombre + ' ' + inscripcion.alumna.apellido}"></strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        DNI: <span th:text="${inscripcion.alumna.dni}"></span>
+                                    </small>
+                                    <br>
+                                    <a th:href="@{/inscripciones/alumna/{id}(id=${inscripcion.alumna.idAlumna})}" 
+                                       class="badge bg-info text-decoration-none">
+                                        <i class="fas fa-list"></i> Ver todas
+                                    </a>
+                                </td>
+                                <td>
+                                    <strong th:text="${inscripcion.horario.curso.nombre}"></strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <span th:text="${inscripcion.horario.diaSemana}"></span>
+                                        <span th:text="${#temporals.format(inscripcion.horario.horaInicio, 'HH:mm') + ' a ' + #temporals.format(inscripcion.horario.horaFin, 'HH:mm')}"></span>
+                                        <br>
+                                        Aula: <span th:text="${inscripcion.horario.aula} ?: 'Sin asignar'"></span>
+                                        <br>
+                                        Cupos: <span th:text="${inscripcion.horario.cuposDisponibles}"></span>
+                                    </small>
+                                    <br>
+                                    <a th:href="@{/inscripciones/horario/{id}(id=${inscripcion.horario.idHorario})}" 
+                                       class="badge bg-warning text-decoration-none">
+                                        <i class="fas fa-list"></i> Ver inscritos
+                                    </a>
+                                </td>
+                                <td th:text="${inscripcion.fechaInscripcion}"></td>
+                                <td>
+                                    <!-- CORREGIDO: nombreEstadoPago en lugar de nombreEstado -->
+                                    <span th:text="${inscripcion.estadoPago?.nombreEstadoPago}"
+                                          th:classappend="${inscripcion.estadoPago?.nombreEstadoPago == 'completado'} ? 'badge bg-success' : 
+                                                          (${inscripcion.estadoPago?.nombreEstadoPago == 'pendiente'} ? 'badge bg-warning' : 'badge bg-secondary')">
+                                    </span>
+                                    <br>
+                                    <small>
+                                        <a href="#" class="text-decoration-none" 
+                                           data-bs-toggle="modal" 
+                                           th:attr="data-bs-target='#modalPago' + ${inscripcion.idInscripcion}">
+                                            <i class="fas fa-edit"></i> Cambiar
+                                        </a>
+                                    </small>
+                                </td>
+                                <td>
+                                    <span th:if="${inscripcion.activo}" class="badge bg-success">
+                                        <i class="fas fa-check"></i> Sí
+                                    </span>
+                                    <span th:unless="${inscripcion.activo}" class="badge bg-danger">
+                                        <i class="fas fa-times"></i> No
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- Botón QR CORREGIDO -->
+                                        <button class="btn btn-info" title="Generar QR"
+                                                th:attr="data-codigo=${inscripcion.codigoInscripcion}"
+                                                onclick="generarQRFromButton(this)">
+                                            <i class="fas fa-qrcode"></i>
+                                        </button>
+                                        <form th:action="@{/inscripciones/eliminar/{id}(id=${inscripcion.idInscripcion})}" 
+                                              method="post" class="d-inline"
+                                              th:onsubmit="return confirm('¿Está seguro de eliminar esta inscripción?');">
+                                            <button type="submit" class="btn btn-danger" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Modal para cambiar estado de pago -->
+                                    <div class="modal fade" th:id="'modalPago' + ${inscripcion.idInscripcion}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Cambiar Estado de Pago</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Inscripción: <strong th:text="${inscripcion.codigoInscripcion}"></strong></p>
+                                                    <p>Alumna: <strong th:text="${inscripcion.alumna.nombre + ' ' + inscripcion.alumna.apellido}"></strong></p>
+                                                    <form th:action="@{/inscripciones/actualizar-pago/{id}(id=${inscripcion.idInscripcion})}" method="post">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Estado de Pago:</label>
+                                                            <select name="idEstadoPago" class="form-select" required>
+                                                                <!-- CORREGIDO: nombreEstadoPago en lugar de nombreEstado -->
+                                                                <option th:each="estado : ${estadosPago}"
+                                                                        th:value="${estado.idEstadoPago}"
+                                                                        th:text="${estado.nombreEstadoPago}"
+                                                                        th:selected="${inscripcion.estadoPago != null and inscripcion.estadoPago.idEstadoPago == estado.idEstadoPago}">
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="d-flex justify-content-end">
+                                                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <div class="mt-4">
+            <a th:href="@{/dashboard}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Volver al Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function generarQRFromButton(button) {
+            const codigo = button.getAttribute('data-codigo');
+            // Simulación de generación de QR
+            alert('Código QR para: ' + codigo + '\n\n(En una implementación real, aquí se generaría el QR)');
+            
+            // En una implementación real, podrías usar:
+            window.open('/inscripciones/qr/' + codigo, '_blank');
+        }
+
+        // Inicializar tooltips de Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>
