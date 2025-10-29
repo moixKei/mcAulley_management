@@ -1,8 +1,6 @@
 package com.mcaulley.app.controller;
 
 import com.mcaulley.app.service.CursoService;
-import com.mcaulley.app.service.HorarioService;
-import com.mcaulley.app.service.InscripcionService;
 import com.mcaulley.app.service.AlumnaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,24 +12,15 @@ public class HomeController {
 
     @Autowired
     private CursoService cursoService;
-    
-    @Autowired
-    private AlumnaService alumnaService;
-    
-    @Autowired
-    private HorarioService horarioService;
-    
-    @Autowired
-    private InscripcionService inscripcionService;
 
-    // Si tienes AlumnaService, descomenta esto:
     // @Autowired
     // private AlumnaService alumnaService;
 
-    @GetMapping("/")
-    public String home() {
-        return "redirect:/menu";
-    }
+    // ELIMINA ESTE MÉTODO porque ya está en LoginController
+    // @GetMapping("/")
+    // public String home() {
+    //     return "redirect:/alumnas";
+    // }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -41,21 +30,13 @@ public class HomeController {
         
         // Si tienes AlumnaService, agrega estas líneas:
         // model.addAttribute("totalAlumnas", alumnaService.listarTodos().size());
-        // model.addAttribute("totalInscripciones", 0); // Ajusta según tu lógica
+        // model.addAttribute("totalInscripciones", 0);
         
         return "dashboard";
     }
 
     @GetMapping("/menu")
-    public String menuPrincipal(Model model) {
-    	// Agregar estadísticas para el dashboard
-        model.addAttribute("totalAlumnas", alumnaService.contarAlumnasActivas());
-        model.addAttribute("totalCursos", cursoService.listarTodos().size());
-        model.addAttribute("totalHorarios", horarioService.listarTodos().size());
-        model.addAttribute("totalInscripciones", inscripcionService.listarTodas().size());
-        model.addAttribute("cursosActivos", cursoService.contarCursosActivos());
-        model.addAttribute("nuevasAlumnas", alumnaService.contarAlumnasRegistradasEsteMes());
-        model.addAttribute("inscripcionesHoy", inscripcionService.contarInscripcionesPorHorario(null));
+    public String menuPrincipal() {
         return "menu";
     }
 }
