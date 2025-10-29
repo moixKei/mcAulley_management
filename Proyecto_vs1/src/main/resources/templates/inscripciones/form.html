@@ -3,148 +3,596 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva Inscripción</title>
+    <title>Nueva Inscripción - McAulley</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --info-color: #4895ef;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        /* Header Styles */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.3);
+        }
+        
+        .page-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .stats-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Card Styles */
+        .form-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 2px solid #e9ecef;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem 2rem;
+            font-weight: 600;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        /* Form Styles */
+        .form-control, .form-select, .form-check-input {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        /* Button Styles */
+        .btn-custom {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid #6b7280;
+            color: #6b7280;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Alert Styles */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        /* Required field indicator */
+        .required::after {
+            content: " *";
+            color: #ef4444;
+        }
+        
+        /* Switch Styles */
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+        }
+        
+        .form-switch .form-check-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        /* Section Styles */
+        .form-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .form-section-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Preview Styles */
+        .preview-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px dashed #bae6fd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .preview-title {
+            font-weight: 600;
+            color: var(--info-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Cupos Styles */
+        .cupos-disponibles {
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+        
+        .cupos-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .cupos-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.5rem;
+                text-align: center;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="fas fa-user-plus me-2"></i>Nueva Inscripción</h1>
-            <a th:href="@{/inscripciones}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i>Volver a Inscripciones
-            </a>
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>
+                        <i class="fas fa-user-plus me-2"></i>
+                        Nueva Inscripción
+                    </h1>
+                    <p class="stats-text mb-0">
+                        Registra una nueva inscripción de alumna a curso
+                    </p>
+                </div>
+                <a th:href="@{/inscripciones}" class="btn btn-light btn-custom">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Inscripciones
+                </a>
+            </div>
         </div>
 
         <!-- Alertas -->
-        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${success}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2 fs-5"></i>
+            <div class="flex-grow-1">
+                <span th:text="${success}"></span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+            <div class="flex-grow-1">
+                <span th:text="${error}"></span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
         <!-- Formulario -->
-        <div class="card">
-            <div class="card-header bg-success text-white">
+        <div class="card form-card">
+            <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="fas fa-info-circle me-1"></i>
+                    <i class="fas fa-user-graduate me-2"></i>
                     Información de la Inscripción
                 </h5>
             </div>
             <div class="card-body">
-                <form th:action="@{/inscripciones/guardar}" method="post" th:object="${inscripcion}">
+                <form th:action="@{/inscripciones/guardar}" method="post" th:object="${inscripcion}" id="inscripcionForm">
                     
-                    <div class="row">
-                        <!-- Alumna - CORREGIDO -->
-                        <div class="col-md-6 mb-3">
-                            <label for="alumna" class="form-label">Alumna *</label>
-                            <select class="form-select" id="alumna" name="alumna.idAlumna" required>
-                                <option value="">Seleccione una alumna</option>
-                                <option th:each="alumna : ${alumnas}" 
-                                        th:value="${alumna.idAlumna}"
-                                        th:text="${alumna.nombre + ' ' + alumna.apellido + ' (DNI: ' + alumna.dni + ')'}"
-                                        th:selected="${inscripcion.alumna != null and inscripcion.alumna.idAlumna == alumna.idAlumna}">
-                                </option>
-                            </select>
-                            <div class="form-text">Seleccione la alumna a inscribir</div>
+                    <!-- Sección: Alumna y Horario -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-users me-2"></i>Selección de Alumna y Horario
                         </div>
+                        <div class="row">
+                            <!-- Alumna -->
+                            <div class="col-md-6 mb-3">
+                                <label for="alumna" class="form-label required">Alumna</label>
+                                <select class="form-select" id="alumna" name="alumna.idAlumna" required>
+                                    <option value="">Seleccione una alumna</option>
+                                    <option th:each="alumna : ${alumnas}" 
+                                            th:value="${alumna.idAlumna}"
+                                            th:text="${alumna.nombre + ' ' + alumna.apellido + ' (DNI: ' + alumna.dni + ')'}"
+                                            th:selected="${inscripcion.alumna != null and inscripcion.alumna.idAlumna == alumna.idAlumna}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Seleccione la alumna a inscribir</div>
+                                
+                                <!-- Vista previa de alumna seleccionada -->
+                                <div id="alumnaPreview" class="preview-card" style="display: none;">
+                                    <div class="preview-title">Alumna Seleccionada:</div>
+                                    <div id="alumnaInfo" class="small"></div>
+                                </div>
+                            </div>
 
-                        <!-- Horario - CORREGIDO -->
-                        <div class="col-md-6 mb-3">
-                            <label for="horario" class="form-label">Horario *</label>
-                            <select class="form-select" id="horario" name="horario.idHorario" required>
-                                <option value="">Seleccione un horario</option>
-                                <option th:each="horario : ${horarios}" 
-                                        th:value="${horario.idHorario}"
-                                        th:text="${horario.curso.nombre + ' - ' + horario.diaSemana + ' ' + #temporals.format(horario.horaInicio, 'HH:mm') + ' a ' + #temporals.format(horario.horaFin, 'HH:mm') + ' (Cupos: ' + horario.cuposDisponibles + ')'}"
-                                        th:disabled="${horario.cuposDisponibles <= 0}"
-                                        th:selected="${inscripcion.horario != null and inscripcion.horario.idHorario == horario.idHorario}">
-                                </option>
-                            </select>
-                            <div class="form-text" id="infoCupos"></div>
+                            <!-- Horario -->
+                            <div class="col-md-6 mb-3">
+                                <label for="horario" class="form-label required">Horario del Curso</label>
+                                <select class="form-select" id="horario" name="horario.idHorario" required>
+                                    <option value="">Seleccione un horario</option>
+                                    <option th:each="horario : ${horarios}" 
+                                            th:value="${horario.idHorario}"
+                                            th:text="${horario.curso.nombre + ' - ' + horario.diaSemana + ' ' + #temporals.format(horario.horaInicio, 'HH:mm') + ' a ' + #temporals.format(horario.horaFin, 'HH:mm') + ' (Cupos: ' + horario.cuposDisponibles + ')'}"
+                                            th:disabled="${horario.cuposDisponibles <= 0}"
+                                            th:selected="${inscripcion.horario != null and inscripcion.horario.idHorario == horario.idHorario}">
+                                    </option>
+                                </select>
+                                <div class="form-text" id="infoCupos"></div>
+                                
+                                <!-- Vista previa de horario seleccionado -->
+                                <div id="horarioPreview" class="preview-card" style="display: none;">
+                                    <div class="preview-title">Horario Seleccionado:</div>
+                                    <div id="horarioInfo" class="small"></div>
+                                    <div id="cuposInfo" class="mt-2"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <!-- Estado de Pago - CORREGIDO -->
-                        <div class="col-md-6 mb-3">
-                            <label for="estadoPago" class="form-label">Estado de Pago</label>
-                            <select class="form-select" id="estadoPago" name="estadoPago.idEstadoPago">
-                                <option value="">Seleccione estado de pago</option>
-                                <option th:each="estadoPago : ${estadosPago}" 
-                                        th:value="${estadoPago.idEstadoPago}"
-                                        th:text="${estadoPago.nombreEstadoPago}"
-                                        th:selected="${inscripcion.estadoPago != null and inscripcion.estadoPago.idEstadoPago == estadoPago.idEstadoPago}">
-                                </option>
-                            </select>
-                            <div class="form-text">Estado inicial del pago</div>
+                    <!-- Sección: Configuración de Inscripción -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-cog me-2"></i>Configuración de la Inscripción
+                        </div>
+                        <div class="row">
+                            <!-- Estado de Pago -->
+                            <div class="col-md-6 mb-3">
+                                <label for="estadoPago" class="form-label">Estado de Pago</label>
+                                <select class="form-select" id="estadoPago" name="estadoPago.idEstadoPago">
+                                    <option value="">Seleccione estado de pago</option>
+                                    <option th:each="estadoPago : ${estadosPago}" 
+                                            th:value="${estadoPago.idEstadoPago}"
+                                            th:text="${estadoPago.nombreEstadoPago}"
+                                            th:selected="${inscripcion.estadoPago != null and inscripcion.estadoPago.idEstadoPago == estadoPago.idEstadoPago}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Estado inicial del pago de la inscripción</div>
+                            </div>
+
+                            <!-- Fecha de Inscripción -->
+                            <div class="col-md-6 mb-3">
+                                <label for="fechaInscripcion" class="form-label">Fecha de Inscripción</label>
+                                <input type="date" class="form-control" id="fechaInscripcion" name="fechaInscripcion"
+                                       th:value="${inscripcion.fechaInscripcion != null ? inscripcion.fechaInscripcion : #temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
+                                <div class="form-text">Fecha en que se realiza la inscripción</div>
+                            </div>
                         </div>
 
-                        <!-- Fecha de Inscripción -->
-                        <div class="col-md-6 mb-3">
-                            <label for="fechaInscripcion" class="form-label">Fecha de Inscripción</label>
-                            <input type="date" class="form-control" id="fechaInscripcion" name="fechaInscripcion"
-                                   th:value="${inscripcion.fechaInscripcion != null ? inscripcion.fechaInscripcion : #temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
-                            <div class="form-text">Fecha en que se realiza la inscripción</div>
+                        <!-- Activo -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="activo" name="activo" th:checked="${inscripcion.activo != null ? inscripcion.activo : true}">
+                                <label class="form-check-label fw-normal" for="activo">
+                                    Inscripción activa en el sistema
+                                </label>
+                            </div>
+                            <div class="form-text">Desactive si la inscripción está cancelada o inactiva</div>
                         </div>
                     </div>
 
-                    <!-- Activo - CORREGIDO -->
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" 
-                                   id="activo" name="activo" th:checked="${inscripcion.activo != null ? inscripcion.activo : true}">
-                            <label class="form-check-label" for="activo">
-                                Inscripción Activa
-                            </label>
+                    <!-- Resumen de Inscripción -->
+                    <div class="form-section" id="resumenSection" style="display: none;">
+                        <div class="form-section-title">
+                            <i class="fas fa-file-alt me-2"></i>Resumen de la Inscripción
                         </div>
-                        <div class="form-text">Desactive si la inscripción está cancelada</div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading mb-2">Detalles de la inscripción:</h6>
+                                    <div id="resumenContent" class="small"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Botones -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <a th:href="@{/inscripciones}" class="btn btn-secondary">
-                            <i class="fas fa-times me-1"></i>Cancelar
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a th:href="@{/inscripciones}" class="btn btn-secondary btn-custom">
+                            <i class="fas fa-times me-2"></i>Cancelar
                         </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save me-1"></i>Registrar Inscripción
-                        </button>
+                        
+                        <div class="d-flex gap-3">
+                            <button type="reset" class="btn btn-outline-secondary btn-custom">
+                                <i class="fas fa-redo me-2"></i>Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-success btn-custom">
+                                <i class="fas fa-save me-2"></i>Registrar Inscripción
+                            </button>
+                        </div>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="card form-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Información Importante
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="fas fa-star me-2"></i>Campos Requeridos</h6>
+                        <ul class="list-unstyled">
+                            <li><small class="text-muted">• Los campos marcados con <span class="text-danger">*</span> son obligatorios</small></li>
+                            <li><small class="text-muted">• La alumna debe estar activa en el sistema</small></li>
+                            <li><small class="text-muted">• El horario debe tener cupos disponibles</small></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary"><i class="fas fa-info-circle me-2"></i>Recomendaciones</h6>
+                        <ul class="list-unstyled">
+                            <li><small class="text-muted">• Verifique la disponibilidad de la alumna</small></li>
+                            <li><small class="text-muted">• Confirme los horarios no se superpongan</small></li>
+                            <li><small class="text-muted">• Revise la información antes de guardar</small></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const horarioSelect = document.getElementById('horario');
-            const infoCupos = document.getElementById('infoCupos');
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
 
-            function actualizarInfoCupos() {
-                const selectedOption = horarioSelect.options[horarioSelect.selectedIndex];
-                if (selectedOption.value) {
-                    const texto = selectedOption.text;
-                    const match = texto.match(/Cupos: (\d+)/);
-                    if (match) {
-                        const cupos = parseInt(match[1]);
-                        if (cupos <= 0) {
-                            infoCupos.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> No hay cupos disponibles</span>';
-                        } else {
-                            infoCupos.innerHTML = `<span class="text-success"><i class="fas fa-check"></i> ${cupos} cupos disponibles</span>`;
-                        }
+        // Funcionalidad para mostrar información de cupos
+        const horarioSelect = document.getElementById('horario');
+        const infoCupos = document.getElementById('infoCupos');
+        const horarioPreview = document.getElementById('horarioPreview');
+        const horarioInfo = document.getElementById('horarioInfo');
+        const cuposInfo = document.getElementById('cuposInfo');
+
+        function actualizarInfoCupos() {
+            const selectedOption = horarioSelect.options[horarioSelect.selectedIndex];
+            if (selectedOption.value) {
+                const texto = selectedOption.text;
+                const match = texto.match(/Cupos: (\d+)/);
+                if (match) {
+                    const cupos = parseInt(match[1]);
+                    
+                    // Actualizar info de cupos
+                    if (cupos <= 0) {
+                        infoCupos.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> No hay cupos disponibles</span>';
+                        cuposInfo.innerHTML = '<span class="cupos-danger"><i class="fas fa-times me-1"></i> Sin cupos disponibles</span>';
+                    } else {
+                        infoCupos.innerHTML = `<span class="text-success"><i class="fas fa-check me-1"></i> ${cupos} cupos disponibles</span>`;
+                        cuposInfo.innerHTML = `<span class="cupos-success"><i class="fas fa-check me-1"></i> ${cupos} cupos disponibles</span>`;
                     }
-                } else {
-                    infoCupos.innerHTML = '';
+                    
+                    // Mostrar vista previa del horario
+                    const horarioData = texto.split(' - ');
+                    horarioInfo.innerHTML = `
+                        <strong>${horarioData[0]}</strong><br>
+                        <span class="text-muted">${horarioData[1]}</span>
+                    `;
+                    horarioPreview.style.display = 'block';
                 }
+            } else {
+                infoCupos.innerHTML = '';
+                horarioPreview.style.display = 'none';
             }
+            actualizarResumen();
+        }
 
-            horarioSelect.addEventListener('change', actualizarInfoCupos);
-            actualizarInfoCupos(); // Ejecutar al cargar la página
+        // Funcionalidad para vista previa de alumna
+        const alumnaSelect = document.getElementById('alumna');
+        const alumnaPreview = document.getElementById('alumnaPreview');
+        const alumnaInfo = document.getElementById('alumnaInfo');
+
+        alumnaSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                const alumnaData = selectedOption.text.split(' (DNI: ');
+                alumnaInfo.innerHTML = `
+                    <strong>${alumnaData[0]}</strong><br>
+                    <span class="text-muted">DNI: ${alumnaData[1].replace(')', '')}</span>
+                `;
+                alumnaPreview.style.display = 'block';
+            } else {
+                alumnaPreview.style.display = 'none';
+            }
+            actualizarResumen();
+        });
+
+        // Funcionalidad para resumen
+        const resumenSection = document.getElementById('resumenSection');
+        const resumenContent = document.getElementById('resumenContent');
+
+        function actualizarResumen() {
+            const alumnaSelected = alumnaSelect.value;
+            const horarioSelected = horarioSelect.value;
+            
+            if (alumnaSelected && horarioSelected) {
+                const alumnaText = alumnaSelect.options[alumnaSelect.selectedIndex].text.split(' (DNI: ')[0];
+                const horarioText = horarioSelect.options[horarioSelect.selectedIndex].text.split(' (Cupos: ')[0];
+                
+                resumenContent.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-user me-2"></i>Alumna:</strong><br>
+                            <span class="text-muted">${alumnaText}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><i class="fas fa-clock me-2"></i>Horario:</strong><br>
+                            <span class="text-muted">${horarioText}</span>
+                        </div>
+                    </div>
+                `;
+                resumenSection.style.display = 'block';
+            } else {
+                resumenSection.style.display = 'none';
+            }
+        }
+
+        // Inicializar eventos
+        horarioSelect.addEventListener('change', actualizarInfoCupos);
+        actualizarInfoCupos(); // Ejecutar al cargar la página
+
+        // Form validation enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('inscripcionForm');
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            form.addEventListener('submit', function(e) {
+                let valid = true;
+                requiredFields.forEach(function(field) {
+                    if (!field.value.trim()) {
+                        valid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+                
+                // Validar cupos disponibles
+                const horarioSelected = horarioSelect.options[horarioSelect.selectedIndex];
+                if (horarioSelected.value) {
+                    const texto = horarioSelected.text;
+                    const match = texto.match(/Cupos: (\d+)/);
+                    if (match && parseInt(match[1]) <= 0) {
+                        valid = false;
+                        infoCupos.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> No se puede inscribir - Sin cupos disponibles</span>';
+                    }
+                }
+                
+                if (!valid) {
+                    e.preventDefault();
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+                    errorDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Por favor, complete todos los campos requeridos y verifique la disponibilidad de cupos.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    form.prepend(errorDiv);
+                }
+            });
         });
     </script>
 </body>

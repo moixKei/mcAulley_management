@@ -1,6 +1,8 @@
 package com.mcaulley.app.controller;
 
 import com.mcaulley.app.service.CursoService;
+import com.mcaulley.app.service.HorarioService;
+import com.mcaulley.app.service.InscripcionService;
 import com.mcaulley.app.service.AlumnaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,15 @@ public class HomeController {
 
     @Autowired
     private CursoService cursoService;
+    
+    @Autowired
+    private AlumnaService alumnaService;
+    
+    @Autowired
+    private HorarioService horarioService;
+    
+    @Autowired
+    private InscripcionService inscripcionService;
 
     // Si tienes AlumnaService, descomenta esto:
     // @Autowired
@@ -19,7 +30,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "redirect:/alumnas";
+        return "redirect:/menu";
     }
 
     @GetMapping("/dashboard")
@@ -36,7 +47,15 @@ public class HomeController {
     }
 
     @GetMapping("/menu")
-    public String menuPrincipal() {
+    public String menuPrincipal(Model model) {
+    	// Agregar estadísticas para el dashboard
+        model.addAttribute("totalAlumnas", alumnaService.contarAlumnasActivas());
+        model.addAttribute("totalCursos", cursoService.listarTodos().size());
+        model.addAttribute("totalHorarios", horarioService.listarTodos().size());
+        model.addAttribute("totalInscripciones", inscripcionService.listarTodas().size());
+        model.addAttribute("cursosActivos", cursoService.contarCursosActivos());
+        model.addAttribute("nuevasAlumnas", alumnaService.contarAlumnasRegistradasEsteMes());
+        model.addAttribute("inscripcionesHoy", inscripcionService.contarInscripcionesPorHorario(null));
         return "menu";
     }
 }

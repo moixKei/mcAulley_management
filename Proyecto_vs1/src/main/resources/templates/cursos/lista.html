@@ -2,200 +2,652 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Cursos</title>
+    <title>Gestión de Cursos - McAulley</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --info-color: #4895ef;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 1400px;
+        }
+        
+        /* Header Styles */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.3);
+        }
+        
+        .page-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .stats-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Button Styles */
+        .btn-custom {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        }
+        
+        .btn-outline-info {
+            border: 2px solid var(--info-color);
+            color: var(--info-color);
+        }
+        
+        .btn-outline-info:hover {
+            background-color: var(--info-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 2px solid #e9ecef;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        /* Form Styles */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        /* Table Styles */
+        .table-container {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .table {
+            margin: 0;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table tbody td {
+            padding: 1.25rem 1.5rem;
+            vertical-align: middle;
+            border: none;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .badge-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .badge-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+        
+        .badge-info {
+            background: linear-gradient(135deg, var(--info-color) 0%, #2563eb 100%);
+        }
+        
+        .badge-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+        
+        .badge-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .badge-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        /* Button Group Styles */
+        .btn-group-sm > .btn {
+            border-radius: 8px;
+            margin: 0 2px;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-info {
+            border: 2px solid var(--info-color);
+            color: var(--info-color);
+        }
+        
+        .btn-outline-warning {
+            border: 2px solid #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .btn-outline-success {
+            border: 2px solid #10b981;
+            color: #10b981;
+        }
+        
+        .btn-outline-danger {
+            border: 2px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .btn-outline-info:hover, .btn-outline-warning:hover, 
+        .btn-outline-success:hover, .btn-outline-danger:hover {
+            transform: translateY(-2px) scale(1.05);
+            color: white;
+        }
+        
+        .btn-outline-info:hover { background-color: var(--info-color); }
+        .btn-outline-warning:hover { background-color: #f59e0b; }
+        .btn-outline-success:hover { background-color: #10b981; }
+        .btn-outline-danger:hover { background-color: #ef4444; }
+        
+        /* Alert Styles */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        /* Price Styles */
+        .price-free {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+        
+        .price-paid {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        /* Course Description */
+        .course-description {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px 15px 0 0;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        /* Quick Filters */
+        .quick-filters .btn {
+            border-radius: 20px;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-filters .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Stats Cards */
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.5rem;
+                text-align: center;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-group .btn {
+                margin: 0.25rem 0;
+            }
+            
+            .course-description {
+                max-width: 200px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="fas fa-book me-2"></i>Gestión de Cursos</h1>
-            <a th:href="@{/cursos/nuevo}" class="btn btn-success">
-                <i class="fas fa-plus me-1"></i>Nuevo Curso
-            </a>
+        <!-- Header con estadísticas -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>📚 Gestión de Cursos</h1>
+                    <p class="stats-text" th:if="${totalCursos != null}">
+                        Total: <span th:text="${totalCursos}"></span> | 
+                        Activos: <span th:text="${cursosActivosCount}"></span> |
+                        Inactivos: <span th:text="${totalCursos - cursosActivosCount}"></span>
+                    </p>
+                </div>
+                <div class="btn-group">
+                    <a th:href="@{/cursos/estadisticas}" class="btn btn-light btn-custom me-2">
+                        <i class="fas fa-chart-bar"></i> Estadísticas
+                    </a>
+                    <a th:href="@{/cursos/nuevo}" class="btn btn-success btn-custom">
+                        <i class="fas fa-plus"></i> Nuevo Curso
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <!-- Alertas -->
+        <!-- Mensajes de éxito/error -->
         <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             <span th:text="${success}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
             <span th:text="${error}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
-        <!-- Buscador -->
-        <div class="card mb-4">
+        <!-- Panel de búsqueda y filtros -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search me-2"></i> Búsqueda y Filtros</h5>
+            </div>
             <div class="card-body">
                 <form th:action="@{/cursos/buscar}" method="get" class="row g-3">
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <input type="text" name="nombre" class="form-control" 
-                               placeholder="Buscar cursos por nombre..." 
+                               placeholder="Nombre del curso" 
                                th:value="${terminoBusqueda ?: ''}">
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary me-2">
-                            <i class="fas fa-search me-1"></i>Buscar
+                    <div class="col-md-3">
+                        <select name="estado" class="form-select">
+                            <option value="">Todos los estados</option>
+                            <option value="Activo" th:selected="${filtroEstado == 'Activo'}">Activo</option>
+                            <option value="Inactivo" th:selected="${filtroEstado == 'Inactivo'}">Inactivo</option>
+                            <option value="En progreso" th:selected="${filtroEstado == 'En progreso'}">En progreso</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="activo" class="form-select">
+                            <option value="">Todos los tipos</option>
+                            <option value="true" th:selected="${filtroActivo == true}">Solo activos</option>
+                            <option value="false" th:selected="${filtroActivo == false}">Solo inactivos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-custom w-100">
+                            <i class="fas fa-search me-2"></i> Buscar
                         </button>
-                        <a th:href="@{/cursos}" class="btn btn-secondary">
-                            <i class="fas fa-refresh me-1"></i>Limpiar
-                        </a>
                     </div>
                 </form>
+                
+                <!-- Filtros rápidos -->
+                <div class="mt-3 quick-filters">
+                    <a th:href="@{/cursos}" class="btn btn-sm btn-outline-secondary">Todos los cursos</a>
+                    <a th:href="@{/cursos/activos}" class="btn btn-sm btn-outline-success">Solo Activos</a>
+                    <a th:href="@{/cursos/gratuitos}" class="btn btn-sm btn-outline-info">Cursos Gratuitos</a>
+                    <span th:if="${terminoBusqueda}" class="badge bg-info ms-2">
+                        Búsqueda: "<span th:text="${terminoBusqueda}"></span>"
+                        <a th:href="@{/cursos}" class="text-white ms-1">×</a>
+                    </span>
+                    <span th:if="${cursos != null}" class="badge bg-primary ms-2">
+                        Resultados: <span th:text="${cursos.size()}"></span>
+                    </span>
+                </div>
             </div>
         </div>
 
-        <!-- Tabla de Cursos -->
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-list me-1"></i>
-                    Lista de Cursos 
-                    <span th:if="${terminoBusqueda}" class="badge bg-light text-dark">
-                        Búsqueda: "<span th:text="${terminoBusqueda}"></span>"
-                    </span>
-                </h5>
+        <!-- Estadísticas rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${totalCursos}">0</h3>
+                                <p class="mb-0 opacity-75">Total Cursos</p>
+                            </div>
+                            <i class="fas fa-book fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div th:if="${cursos.empty}" class="text-center py-4">
-                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${cursosActivosCount}">0</h3>
+                                <p class="mb-0 opacity-75">Cursos Activos</p>
+                            </div>
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${totalCursos - cursosActivosCount}">0</h3>
+                                <p class="mb-0 opacity-75">Cursos Inactivos</p>
+                            </div>
+                            <i class="fas fa-pause-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${cursosGratuitos != null ? cursosGratuitos : '0'}">0</h3>
+                                <p class="mb-0 opacity-75">Cursos Gratuitos</p>
+                            </div>
+                            <i class="fas fa-gift fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de cursos -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i> Lista de Cursos</h5>
+                <span class="badge bg-secondary" th:text="'Mostrando: ' + ${cursos.size()}"></span>
+            </div>
+            <div class="card-body p-0 table-container">
+                <div th:if="${cursos.empty}" class="empty-state">
+                    <i class="fas fa-book-open"></i>
                     <h5 class="text-muted">No se encontraron cursos</h5>
                     <p th:if="${terminoBusqueda}" class="text-muted">
                         No hay resultados para "<span th:text="${terminoBusqueda}"></span>"
                     </p>
-                    <a th:href="@{/cursos/nuevo}" class="btn btn-primary mt-2">
-                        <i class="fas fa-plus me-1"></i>Crear Primer Curso
+                    <p th:unless="${terminoBusqueda}" class="text-muted">
+                        Comienza creando tu primer curso
+                    </p>
+                    <a th:href="@{/cursos/nuevo}" class="btn btn-primary btn-custom mt-3">
+                        <i class="fas fa-plus me-2"></i>Crear Primer Curso
                     </a>
                 </div>
 
-                <div th:unless="${cursos.empty}" class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Duración (horas)</th>
-                                <th>Precio</th>
-                                <th>Cupo Máximo</th>
-                                <th>Estado</th>
-                                <th>Activo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-						    <tr th:each="curso : ${cursos}">
-						        <td th:text="${curso.idCurso}"></td>
-						        <td>
-						            <strong th:text="${curso.nombre}"></strong>
-						            <br>
-						            <small class="text-muted" th:text="${curso.descripcion} ?: 'Sin descripción'"></small>
-						        </td>
-						        <td th:text="${curso.duracionHoras} ?: 'N/A'"></td>
-						        <td>
-						            <span th:if="${curso.precio > 0}" 
-						                  th:text="'$' + ${#numbers.formatDecimal(curso.precio, 1, 2)}"
-						                  class="badge bg-success">
-						            </span>
-						            <span th:unless="${curso.precio > 0}" 
-						                  class="badge bg-secondary">Gratis</span>
-						        </td>
-						        <td th:text="${curso.cupoMaximo}"></td>
-						        <td>
-						            <!-- ✅ ESTADO DEL CURSO (Activo/Inactivo/En progreso) -->
-						            <span th:text="${curso.estado?.nombreEstado}"
-						                  th:classappend="${curso.estado?.nombreEstado == 'Activo'} ? 'badge bg-success' : 
-						                                  (${curso.estado?.nombreEstado == 'Inactivo'} ? 'badge bg-danger' : 'badge bg-warning')">
-						            </span>
-						        </td>
-						        <td>
-						            <!-- ✅ ESTADO ACTIVO/INACTIVO (booleano) -->
-						            <span th:if="${curso.activo}" class="badge bg-success">
-						                <i class="fas fa-check"></i> Sí
-						            </span>
-						            <span th:unless="${curso.activo}" class="badge bg-danger">
-						                <i class="fas fa-times"></i> No
-						            </span>
-						        </td>
-						        <td>
-						            <div class="btn-group btn-group-sm" role="group">
-						                <a th:href="@{/cursos/detalle/{id}(id=${curso.idCurso})}" 
-						                   class="btn btn-info" title="Ver detalle">
-						                    <i class="fas fa-eye"></i>
-						                </a>
-						                <a th:href="@{/cursos/editar/{id}(id=${curso.idCurso})}" 
-						                   class="btn btn-warning" title="Editar">
-						                    <i class="fas fa-edit"></i>
-						                </a>
-						                <form th:action="@{/cursos/eliminar/{id}(id=${curso.idCurso})}" 
-						                      method="post" class="d-inline"
-						                      th:onsubmit="return confirm('¿Está seguro de eliminar el curso \\'' + ${curso.nombre} + '\\'?');">
-						                    <button type="submit" class="btn btn-danger" title="Eliminar">
-						                        <i class="fas fa-trash"></i>
-						                    </button>
-						                </form>
-						            </div>
-						        </td>
-						    </tr>
-						</tbody>
-                    </table>
-                </div>
+                <table th:unless="${cursos.empty}" class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Curso</th>
+                            <th>Duración</th>
+                            <th>Precio</th>
+                            <th>Cupo</th>
+                            <th>Estado</th>
+                            <th>Activo</th>
+                            <th width="220">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="curso : ${cursos}">
+                            <td>
+                                <span class="text-muted small" th:text="${curso.idCurso}"></span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark" th:text="${curso.nombre}"></div>
+                                <div class="course-description text-muted small" 
+                                     th:text="${curso.descripcion} ?: 'Sin descripción'"
+                                     title="${curso.descripcion}">
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <span th:text="${curso.duracionHoras} ?: 'N/A'"></span>h
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${curso.precio > 0}" 
+                                      class="badge price-paid">
+                                    $<span th:text="${#numbers.formatDecimal(curso.precio, 1, 2)}"></span>
+                                </span>
+                                <span th:unless="${curso.precio > 0}" 
+                                      class="badge price-free">
+                                    <i class="fas fa-gift me-1"></i>Gratis
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold" th:text="${curso.cupoMaximo}"></span>
+                            </td>
+                            <td>
+                                <span th:text="${curso.estado?.nombreEstado}"
+                                      th:classappend="${curso.estado?.nombreEstado == 'Activo'} ? 'badge bg-success' : 
+                                                      (${curso.estado?.nombreEstado == 'Inactivo'} ? 'badge bg-danger' : 'badge bg-warning')">
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${curso.activo}" class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i> Sí
+                                </span>
+                                <span th:unless="${curso.activo}" class="badge bg-secondary">
+                                    <i class="fas fa-times me-1"></i> No
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a th:href="@{/cursos/detalle/{id}(id=${curso.idCurso})}" 
+                                       class="btn btn-outline-info" title="Ver detalle">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a th:href="@{/cursos/editar/{id}(id=${curso.idCurso})}" 
+                                       class="btn btn-outline-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    
+                                    <!-- Toggle Estado Activo -->
+                                    <form th:action="@{/cursos/toggle-activo/{id}(id=${curso.idCurso})}" 
+                                          method="post" class="d-inline">
+                                        <button type="submit" 
+                                                th:classappend="${curso.activo} ? 'btn-outline-warning' : 'btn-outline-success'"
+                                                class="btn" 
+                                                th:title="${curso.activo} ? 'Desactivar' : 'Activar'">
+                                            <i th:classappend="${curso.activo} ? 'fa-toggle-on' : 'fa-toggle-off'" 
+                                               class="fas"></i>
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Eliminar -->
+                                    <button type="button" 
+                                            class="btn btn-outline-danger" 
+                                            title="Eliminar"
+                                            data-bs-toggle="modal" 
+                                            th:attr="data-bs-target='#modalEliminar' + ${curso.idCurso}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Modal de confirmación para eliminar -->
+                                <div class="modal fade" th:id="'modalEliminar' + ${curso.idCurso}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirmar Eliminación</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>¿Estás seguro de que deseas eliminar el curso?</p>
+                                                <div class="alert alert-warning">
+                                                    <strong th:text="${curso.nombre}"></strong><br>
+                                                    <small th:text="${curso.descripcion} ?: 'Sin descripción'"></small>
+                                                </div>
+                                                <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form th:action="@{/cursos/eliminar/{id}(id=${curso.idCurso})}" method="post">
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Estadísticas - CORREGIDO -->
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h4 th:text="${totalCursos}">0</h4>
-                                <p class="mb-0">Total Cursos</p>
-                            </div>
-                            <div class="align-self-center">
-                                <i class="fas fa-book fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <!-- CORRECCIÓN: Usar el atributo del modelo en lugar de llamar al servicio directamente -->
-                                <h4 th:text="${cursosActivosCount}">0</h4>
-                                <p class="mb-0">Cursos Activos</p>
-                            </div>
-                            <div class="align-self-center">
-                                <i class="fas fa-check-circle fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-info">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h4 th:text="${totalCursos - cursosActivosCount}">0</h4>
-                                <p class="mb-0">Cursos Inactivos</p>
-                            </div>
-                            <div class="align-self-center">
-                                <i class="fas fa-pause-circle fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Operaciones batch -->
+        <div class="mt-3 text-end">
+            <form th:action="@{/cursos/desactivar-antiguos}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-clock"></i> Desactivar Cursos Antiguos
+                </button>
+            </form>
+            <a th:href="@{/}" class="btn btn-secondary btn-sm ms-2">
+                <i class="fas fa-home"></i> Inicio
+            </a>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Tooltip initialization
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
 </body>
 </html>

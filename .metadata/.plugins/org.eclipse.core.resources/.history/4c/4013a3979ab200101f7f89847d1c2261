@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cursos | Sistema Académico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            --info-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        .card-statistic {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .card-statistic:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-statistic .card-body {
+            padding: 1.5rem;
+        }
+        
+        .header-gradient {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .btn-action {
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+        
+        .search-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #f8f9fa;
+        }
+        
+        .course-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .course-description {
+            font-size: 0.875rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        
+        .badge-pill {
+            border-radius: 12px;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+        }
+        
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .empty-state i {
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <!-- Header Principal -->
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-primary mb-1">
+                    <i class="fas fa-graduation-cap me-2"></i>Gestión de Cursos
+                </h1>
+                <p class="text-muted mb-0">Administra y organiza tu catálogo de cursos</p>
+            </div>
+            <a th:href="@{/cursos/nuevo}" class="btn btn-success btn-lg px-4">
+                <i class="fas fa-plus me-2"></i>Nuevo Curso
+            </a>
+        </header>
+
+        <!-- Sistema de Alertas -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2 fs-5"></i>
+            <div class="flex-grow-1">
+                <span th:text="${success}"></span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+            <div class="flex-grow-1">
+                <span th:text="${error}"></span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Panel de Búsqueda -->
+        <section class="card search-card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-search me-2 text-primary"></i>Buscar Cursos
+                </h5>
+                <form th:action="@{/cursos/buscar}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label for="searchInput" class="form-label small text-muted">Nombre del curso</label>
+                        <input type="text" name="nombre" id="searchInput" class="form-control form-control-lg" 
+                               placeholder="Ingresa el nombre del curso..." 
+                               th:value="${terminoBusqueda ?: ''}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                        <a th:href="@{/cursos}" class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="fas fa-refresh me-1"></i>Limpiar Filtros
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Panel de Estadísticas -->
+        <section class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card card-statistic bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${totalCursos}">0</h3>
+                                <p class="mb-0 opacity-75">Total de Cursos</p>
+                            </div>
+                            <i class="fas fa-book-open fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card card-statistic bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${cursosActivosCount}">0</h3>
+                                <p class="mb-0 opacity-75">Cursos Activos</p>
+                            </div>
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card card-statistic bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-0" th:text="${totalCursos - cursosActivosCount}">0</h3>
+                                <p class="mb-0 opacity-75">Cursos Inactivos</p>
+                            </div>
+                            <i class="fas fa-pause-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lista de Cursos -->
+        <section class="card shadow-sm border-0">
+            <div class="card-header header-gradient border-0 py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Cursos
+                    </h5>
+                    <span th:if="${terminoBusqueda}" class="badge bg-light text-dark fs-6">
+                        <i class="fas fa-filter me-1"></i>
+                        Filtro: "<span th:text="${terminoBusqueda}"></span>"
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                <!-- Estado vacío -->
+                <div th:if="${cursos.empty}" class="empty-state">
+                    <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted mb-2">No se encontraron cursos</h4>
+                    <p th:if="${terminoBusqueda}" class="text-muted mb-3">
+                        No hay resultados para "<span th:text="${terminoBusqueda}" class="fw-bold"></span>"
+                    </p>
+                    <p th:unless="${terminoBusqueda}" class="text-muted mb-3">
+                        Comienza agregando tu primer curso al sistema
+                    </p>
+                    <a th:href="@{/cursos/nuevo}" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-plus me-2"></i>Crear Primer Curso
+                    </a>
+                </div>
+
+                <!-- Tabla de cursos -->
+                <div th:unless="${cursos.empty}" class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0">ID</th>
+                                <th class="border-0">Curso</th>
+                                <th class="border-0">Duración</th>
+                                <th class="border-0">Precio</th>
+                                <th class="border-0">Cupo</th>
+                                <th class="border-0">Estado</th>
+                                <th class="border-0">Activo</th>
+                                <th class="border-0 text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="curso : ${cursos}" class="align-middle">
+                                <td>
+                                    <span class="text-muted small" th:text="${curso.idCurso}"></span>
+                                </td>
+                                <td>
+                                    <div class="course-name" th:text="${curso.nombre}"></div>
+                                    <div class="course-description" 
+                                         th:text="${curso.descripcion} ?: 'Sin descripción disponible'">
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark" 
+                                          th:text="${curso.duracionHoras} + ' hrs' ?: 'N/A'">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${curso.precio > 0}" 
+                                          class="badge bg-success badge-pill fw-normal">
+                                        $<span th:text="${#numbers.formatDecimal(curso.precio, 1, 2)}"></span>
+                                    </span>
+                                    <span th:unless="${curso.precio > 0}" 
+                                          class="badge bg-secondary badge-pill fw-normal">
+                                        Gratis
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold" th:text="${curso.cupoMaximo}"></span>
+                                </td>
+                                <td>
+                                    <span th:text="${curso.estado?.nombreEstado}"
+                                          th:classappend="${curso.estado?.nombreEstado == 'Activo'} ? 'badge bg-success' : 
+                                                          (${curso.estado?.nombreEstado == 'Inactivo'} ? 'badge bg-danger' : 'badge bg-warning')"
+                                          class="badge badge-pill">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${curso.activo}" 
+                                          class="badge bg-success badge-pill">
+                                        <i class="fas fa-check me-1"></i>Sí
+                                    </span>
+                                    <span th:unless="${curso.activo}" 
+                                          class="badge bg-danger badge-pill">
+                                        <i class="fas fa-times me-1"></i>No
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-end">
+                                        <a th:href="@{/cursos/detalle/{id}(id=${curso.idCurso})}" 
+                                           class="btn btn-info btn-action" 
+                                           title="Ver detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/cursos/editar/{id}(id=${curso.idCurso})}" 
+                                           class="btn btn-warning btn-action" 
+                                           title="Editar curso">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form th:action="@{/cursos/eliminar/{id}(id=${curso.idCurso})}" 
+                                              method="post" 
+                                              class="d-inline"
+                                              th:onsubmit="return confirm('¿Está seguro de eliminar el curso \'' + ${curso.nombre} + '\'?');">
+                                            <button type="submit" 
+                                                    class="btn btn-danger btn-action" 
+                                                    title="Eliminar curso">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

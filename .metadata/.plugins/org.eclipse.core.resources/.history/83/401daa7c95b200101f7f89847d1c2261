@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Alumnas - McAulley</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.75em;
+            padding: 4px 8px;
+        }
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        .table-responsive-custom {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .search-highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <!-- Header Mejorado -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 fw-bold text-primary">
+                            <i class="fas fa-users me-2"></i>Gestión de Alumnas
+                        </h1>
+                        <p class="text-muted mb-0">Administra el registro completo de estudiantes</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="btn-group">
+                            <a th:href="@{/alumnas/exportar}" class="btn btn-outline-secondary">
+                                <i class="fas fa-download me-1"></i>Exportar
+                            </a>
+                            <a th:href="@{/alumnas/estadisticas}" class="btn btn-outline-info">
+                                <i class="fas fa-chart-bar me-1"></i>Estadísticas
+                            </a>
+                            <a th:href="@{/alumnas/nuevo}" class="btn btn-success">
+                                <i class="fas fa-user-plus me-1"></i>Nueva Alumna
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Estadísticas Rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="mb-0" th:text="${totalAlumnas ?: '0'}">0</h4>
+                                <p class="mb-0 opacity-75">Total Alumnas</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-users fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="mb-0" th:text="${alumnasActivas ?: '0'}">0</h4>
+                                <p class="mb-0 opacity-75">Activas</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="mb-0" th:text="${nuevasHoy ?: '0'}">0</h4>
+                                <p class="mb-0 opacity-75">Nuevas Hoy</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-user-plus fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="mb-0" th:text="${totalInscritas ?: '0'}">0</h4>
+                                <p class="mb-0 opacity-75">Con Inscripción</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-user-graduate fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes Mejorados -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <div>
+                <strong>¡Éxito!</strong> <span th:text="${success}"></span>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>
+                <strong>Error:</strong> <span th:text="${error}"></span>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Panel de Búsqueda Avanzado -->
+        <div class="card card-hover mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-search me-2"></i>Búsqueda Avanzada</h5>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvanzados">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/alumnas}" method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre..." 
+                               th:value="${param.nombre}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Apellido</label>
+                        <input type="text" name="apellido" class="form-control" placeholder="Buscar por apellido..." 
+                               th:value="${param.apellido}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">DNI</label>
+                        <input type="text" name="dni" class="form-control" placeholder="Número DNI" 
+                               th:value="${param.dni}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted">Estado</label>
+                        <select name="activa" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="true" th:selected="${param.activa == 'true'}">Activas</option>
+                            <option value="false" th:selected="${param.activa == 'false'}">Inactivas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i>Buscar
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Filtros Avanzados (Collapsible) -->
+                <div class="collapse mt-3" id="filtrosAvanzados">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Fecha Desde</label>
+                            <input type="date" name="fechaDesde" class="form-control" th:value="${param.fechaDesde}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Fecha Hasta</label>
+                            <input type="date" name="fechaHasta" class="form-control" th:value="${param.fechaHasta}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Ordenar por</label>
+                            <select name="orden" class="form-select">
+                                <option value="fechaRegistro">Fecha Registro</option>
+                                <option value="nombre">Nombre A-Z</option>
+                                <option value="apellido">Apellido A-Z</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros Activos -->
+                <div class="mt-3" th:if="${param.nombre or param.apellido or param.dni}">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border">
+                            Filtros activos:
+                        </span>
+                        <th:block th:if="${param.nombre}">
+                            <span class="badge bg-primary">
+                                Nombre: <span th:text="${param.nombre}"></span>
+                                <a th:href="@{/alumnas(apellido=${param.apellido},dni=${param.dni},activa=${param.activa})}" 
+                                   class="text-white ms-1">×</a>
+                            </span>
+                        </th:block>
+                        <th:block th:if="${param.apellido}">
+                            <span class="badge bg-primary">
+                                Apellido: <span th:text="${param.apellido}"></span>
+                                <a th:href="@{/alumnas(nombre=${param.nombre},dni=${param.dni},activa=${param.activa})}" 
+                                   class="text-white ms-1">×</a>
+                            </span>
+                        </th:block>
+                        <th:block th:if="${param.dni}">
+                            <span class="badge bg-primary">
+                                DNI: <span th:text="${param.dni}"></span>
+                                <a th:href="@{/alumnas(nombre=${param.nombre},apellido=${param.apellido},activa=${param.activa})}" 
+                                   class="text-white ms-1">×</a>
+                            </span>
+                        </th:block>
+                        <a th:href="@{/alumnas}" class="btn btn-sm btn-outline-secondary">Limpiar filtros</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Alumnas Mejorada -->
+        <div class="card card-hover">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lista de Alumnas</h5>
+                    <small class="text-muted" th:if="${listaAlumnas}">
+                        Mostrando <span th:text="${listaAlumnas.size()}"></span> de <span th:text="${totalAlumnas}"></span> registros
+                    </small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="input-group input-group-sm" style="width: 200px;">
+                        <input type="text" id="searchTable" class="form-control" placeholder="Buscar en tabla...">
+                        <button class="btn btn-outline-secondary" type="button" onclick="clearTableSearch()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-columns"></i> Columnas
+                        </button>
+                        <ul class="dropdown-menu" id="columnToggle">
+                            <li><a class="dropdown-item" href="#" data-column="0">ID</a></li>
+                            <li><a class="dropdown-item" href="#" data-column="1">Nombre</a></li>
+                            <li><a class="dropdown-item" href="#" data-column="2">DNI</a></li>
+                            <li><a class="dropdown-item" href="#" data-column="3">Contacto</a></li>
+                            <li><a class="dropdown-item" href="#" data-column="4">Fecha Registro</a></li>
+                            <li><a class="dropdown-item" href="#" data-column="5">Estado</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div th:if="${listaAlumnas.empty}" class="text-center py-5">
+                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No se encontraron alumnas</h4>
+                    <p class="text-muted mb-4">No hay registros que coincidan con los criterios de búsqueda</p>
+                    <a th:href="@{/alumnas/nuevo}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Registrar Primera Alumna
+                    </a>
+                </div>
+
+                <div th:unless="${listaAlumnas.empty}" class="table-responsive table-responsive-custom">
+                    <table class="table table-hover mb-0" id="alumnasTable">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th width="80">ID</th>
+                                <th>Nombre Completo</th>
+                                <th width="120">DNI</th>
+                                <th width="200">Contacto</th>
+                                <th width="120">Fecha Registro</th>
+                                <th width="100">Estado</th>
+                                <th width="150" class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="alumna : ${listaAlumnas}" class="align-middle">
+                                <td>
+                                    <span class="badge bg-secondary">#<span th:text="${alumna.idAlumna}"></span></span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 40px; height: 40px; font-size: 14px;">
+                                            <span th:text="${alumna.nombre.substring(0,1) + alumna.apellido.substring(0,1)}"></span>
+                                        </div>
+                                        <div>
+                                            <strong th:text="${alumna.nombre + ' ' + alumna.apellido}"></strong>
+                                            <br>
+                                            <small class="text-muted" th:if="${alumna.direccion}">
+                                                <i class="fas fa-map-marker-alt me-1"></i>
+                                                <span th:text="${alumna.direccion}"></span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code class="bg-light p-1 rounded" th:text="${alumna.dni}"></code>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        <div th:if="${alumna.correo}">
+                                            <a th:href="'mailto:' + ${alumna.correo}" class="text-decoration-none">
+                                                <i class="fas fa-envelope text-primary me-1"></i>
+                                                <small th:text="${alumna.correo}"></small>
+                                            </a>
+                                        </div>
+                                        <div th:if="${alumna.celular}">
+                                            <a th:href="'tel:' + ${alumna.celular}" class="text-decoration-none">
+                                                <i class="fas fa-phone text-success me-1"></i>
+                                                <small th:text="${alumna.celular}"></small>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-center">
+                                        <div class="fw-bold" th:text="${#temporals.format(alumna.fechaRegistro, 'dd/MM/yyyy')}"></div>
+                                        <small class="text-muted" th:text="${#temporals.format(alumna.fechaRegistro, 'HH:mm')}"></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:if="${alumna.activo}" class="badge bg-success status-badge">
+                                        <i class="fas fa-check-circle me-1"></i>Activa
+                                    </span>
+                                    <span th:unless="${alumna.activo}" class="badge bg-secondary status-badge">
+                                        <i class="fas fa-times-circle me-1"></i>Inactiva
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <!-- Ver Detalle -->
+                                        <a th:href="@{/alumnas/detalle/} + ${alumna.idAlumna}" 
+                                           class="btn btn-sm btn-outline-info action-btn" 
+                                           title="Ver detalle completo">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        
+                                        <!-- Editar -->
+                                        <a th:href="@{/alumnas/editar/} + ${alumna.idAlumna}" 
+                                           class="btn btn-sm btn-outline-warning action-btn" 
+                                           title="Editar información">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        
+                                        <!-- Toggle Estado -->
+                                        <form th:action="@{/alumnas/toggle-estado/} + ${alumna.idAlumna}" 
+                                              method="post" class="d-inline">
+                                            <button type="submit" 
+                                                    class="btn btn-sm action-btn"
+                                                    th:classappend="${alumna.activo} ? 'btn-outline-warning' : 'btn-outline-success'"
+                                                    th:title="${alumna.activo} ? 'Desactivar alumna' : 'Activar alumna'">
+                                                <i th:classappend="${alumna.activo} ? 'fa-toggle-on' : 'fa-toggle-off'" 
+                                                   class="fas"></i>
+                                            </button>
+                                        </form>
+                                        
+                                        <!-- Eliminar -->
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger action-btn" 
+                                                title="Eliminar alumna"
+                                                data-bs-toggle="modal" 
+                                                th:attr="data-bs-target='#modalEliminar' + ${alumna.idAlumna}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Modal de Eliminación -->
+                                    <div class="modal fade" th:id="'modalEliminar' + ${alumna.idAlumna}" tabindex="-1">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title text-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Confirmar Eliminación
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="alert alert-warning">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <strong>¿Estás seguro de eliminar esta alumna?</strong>
+                                                    </div>
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <div class="avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                                             style="width: 50px; height: 50px; font-size: 16px;">
+                                                            <span th:text="${alumna.nombre.substring(0,1) + alumna.apellido.substring(0,1)}"></span>
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-1" th:text="${alumna.nombre + ' ' + alumna.apellido}"></h6>
+                                                            <p class="mb-0 text-muted">
+                                                                DNI: <code th:text="${alumna.dni}"></code> | 
+                                                                <span th:text="${alumna.correo}"></span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-danger small">
+                                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                                        Esta acción no se puede deshacer y eliminará todos los registros asociados.
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                        <i class="fas fa-times me-1"></i>Cancelar
+                                                    </button>
+                                                    <form th:action="@{/alumnas/eliminar/} + ${alumna.idAlumna}" method="post">
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="fas fa-trash me-1"></i>Eliminar Definitivamente
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <div class="card-footer bg-white" th:if="${totalPaginas > 1}">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item" th:classappend="${paginaActual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/alumnas(pagina=1)}">Primera</a>
+                        </li>
+                        <li class="page-item" th:classappend="${paginaActual == 1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/alumnas(pagina=${paginaActual-1})}">Anterior</a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(1, totalPaginas)}" 
+                            class="page-item" th:classappend="${i == paginaActual} ? 'active'">
+                            <a class="page-link" th:href="@{/alumnas(pagina=${i})}" th:text="${i}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${paginaActual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/alumnas(pagina=${paginaActual+1})}">Siguiente</a>
+                        </li>
+                        <li class="page-item" th:classappend="${paginaActual == totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/alumnas(pagina=${totalPaginas})}">Última</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas en Footer -->
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+            <div>
+                <a th:href="@{/menu}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Volver al Menú
+                </a>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalAyuda">
+                    <i class="fas fa-question-circle me-1"></i>Ayuda
+                </button>
+                <a th:href="@{/alumnas/exportar}" class="btn btn-outline-success">
+                    <i class="fas fa-file-export me-1"></i>Exportar CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ayuda -->
+    <div class="modal fade" id="modalAyuda" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Ayuda - Gestión de Alumnas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Funcionalidades disponibles:</h6>
+                    <ul>
+                        <li><strong>Buscar:</strong> Filtra alumnas por nombre, apellido o DNI</li>
+                        <li><strong>Ver detalle:</strong> Información completa de la alumna</li>
+                        <li><strong>Editar:</strong> Modificar datos de la alumna</li>
+                        <li><strong>Activar/Desactivar:</strong> Cambiar estado de la alumna</li>
+                        <li><strong>Exportar:</strong> Descargar lista en formato CSV</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Búsqueda en tiempo real en la tabla
+        document.getElementById('searchTable')?.addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#alumnasTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+
+        function clearTableSearch() {
+            document.getElementById('searchTable').value = '';
+            document.querySelectorAll('#alumnasTable tbody tr').forEach(row => {
+                row.style.display = '';
+            });
+        }
+
+        // Toggle de columnas
+        document.querySelectorAll('#columnToggle .dropdown-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const columnIndex = this.getAttribute('data-column');
+                const table = document.getElementById('alumnasTable');
+                const rows = table.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const cell = row.cells[columnIndex];
+                    if (cell) {
+                        cell.style.display = cell.style.display === 'none' ? '' : 'none';
+                    }
+                });
+                
+                this.classList.toggle('active');
+            });
+        });
+
+        // Auto-dismiss alerts
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+</body>
+</html>

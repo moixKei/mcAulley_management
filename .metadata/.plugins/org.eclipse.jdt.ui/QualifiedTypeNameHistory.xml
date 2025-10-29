@@ -9,7 +9,6 @@
     <fullyQualifiedTypeName name="jakarta.persistence.Column"/>
     <fullyQualifiedTypeName name="jakarta.persistence.GenerationType"/>
     <fullyQualifiedTypeName name="org.springframework.data.jpa.repository.JpaRepository"/>
-    <fullyQualifiedTypeName name="com.mcaulley.app.service.AlumnaService"/>
     <fullyQualifiedTypeName name="org.springframework.beans.factory.annotation.Autowired"/>
     <fullyQualifiedTypeName name="com.mcaulley.app.repository.AlumnaRepository"/>
     <fullyQualifiedTypeName name="java.lang.Override"/>
@@ -21,4 +20,7 @@
     <fullyQualifiedTypeName name="java.util.Map"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="com.mcaulley.app.service.AlumnaService"/>
+    <fullyQualifiedTypeName name="com.mcaulley.app.service.HorarioService"/>
+    <fullyQualifiedTypeName name="com.mcaulley.app.service.InscripcionService"/>
 </qualifiedTypeNameHistroy>
